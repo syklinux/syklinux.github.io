@@ -5,7 +5,7 @@
   
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <link rel="dns-prefetch" href="http://example.com">
+  <link rel="dns-prefetch" href="https://syklinux.github.io">
   <title>svn 钩子 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -13,13 +13,14 @@
   <meta name="description" content="钩子脚本就是 shell 的写法，钩子就是被某些版本库事件触发的程序。  一、svn 钩子钩子脚本就是shell的写法，钩子就是被某些版本库事件触发的程序。  常用钩子： post-commit在提交完成成功创建之后执行该钩子。（提交已经完成，不可更改) 更新之后，通过邮件、微信通知、更新触发 checkout 程序、然后推送到服务器 pre-commit提交完成前触发执行该脚本。限制上传文件的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="svn 钩子">
-<meta property="og:url" content="http://example.com/2023/09/27/svn/index.html">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/27/svn/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
 <meta property="og:description" content="钩子脚本就是 shell 的写法，钩子就是被某些版本库事件触发的程序。  一、svn 钩子钩子脚本就是shell的写法，钩子就是被某些版本库事件触发的程序。  常用钩子： post-commit在提交完成成功创建之后执行该钩子。（提交已经完成，不可更改) 更新之后，通过邮件、微信通知、更新触发 checkout 程序、然后推送到服务器 pre-commit提交完成前触发执行该脚本。限制上传文件的">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-27T07:57:28.000Z">
-<meta property="article:modified_time" content="2023-09-27T08:13:56.863Z">
+<meta property="article:modified_time" content="2023-09-27T08:30:56.439Z">
 <meta property="article:author" content="syklinux">
+<meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
@@ -189,7 +190,7 @@
 				
 					<li style="width: 33.333333333333336%"><a href="/">主页</a></li>
 		        
-					<li style="width: 33.333333333333336%"><a target="_blank" rel="noopener" href="https://syklinux.github.io/">技术笔记</a></li>
+					<li style="width: 33.333333333333336%"><a href="https://syklinux.github.io/">技术笔记</a></li>
 		        
 					<li style="width: 33.333333333333336%"><a href="/tags/%E9%9A%8F%E7%AC%94/">随笔</a></li>
 		        
@@ -240,7 +241,7 @@
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">339字</span>
+      <span class="post-count">337字</span>
     </span>
   </span>
 
@@ -269,7 +270,7 @@
 <li>post-commit<br>在提交完成成功创建之后执行该钩子。（提交已经完成，不可更改) 更新之后，通过邮件、微信通知、更新触发 checkout 程序、然后推送到服务器</li>
 <li>pre-commit<br>提交完成前触发执行该脚本。限制上传文件的大小和拓展名，控制提交要输入的信息</li>
 </ul>
-<h4 id="下面写一个小例子："><a href="#下面写一个小例子：" class="headerlink" title="下面写一个小例子："></a>下面写一个小例子：</h4><h5 id="rsync-与-svn-钩子结合实现数据实时同步到服务器"><a href="#rsync-与-svn-钩子结合实现数据实时同步到服务器" class="headerlink" title="rsync 与 svn 钩子结合实现数据实时同步到服务器"></a>rsync 与 svn 钩子结合实现数据实时同步到服务器</h5><ul>
+<h4 id="下面写一个小例子：-rsync-与-svn-钩子结合实现数据实时同步到服务器"><a href="#下面写一个小例子：-rsync-与-svn-钩子结合实现数据实时同步到服务器" class="headerlink" title="下面写一个小例子： rsync 与 svn 钩子结合实现数据实时同步到服务器"></a>下面写一个小例子： rsync 与 svn 钩子结合实现数据实时同步到服务器</h4><ul>
 <li>1、建立同步 web 目录</li>
 </ul>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir /data/www</span><br></pre></td></tr></table></figure>
@@ -285,7 +286,7 @@
 <figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp <span class="built_in">post</span>-commit.tmpl <span class="built_in">post</span>-commit</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>4、编写脚本\r\n</li>
+<li>4、编写脚本</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">1) &gt; post-commit</span><br><span class="line">2) <span class="built_in">chmod</span> 700 post-commit</span><br><span class="line">3) vim post-commit 添加:</span><br><span class="line">    <span class="comment">#!/bin/bash</span></span><br><span class="line">    REPOS=<span class="string">&quot;<span class="variable">$1</span>&quot;</span></span><br><span class="line">    REV=<span class="string">&quot;<span class="variable">$2</span>&quot;</span></span><br><span class="line">    <span class="built_in">export</span> LANG=en_US.UTF-8</span><br><span class="line">    LOGPATH=<span class="string">&quot;/tmp/log&quot;</span></span><br><span class="line">    [ ! -d <span class="variable">$&#123;LOGPATH&#125;</span> ]  &amp;&amp; <span class="built_in">mkdir</span> <span class="variable">$&#123;LOGPATH&#125;</span> -P</span><br><span class="line">    SVN=/usr/bin/svn</span><br><span class="line">    <span class="variable">$SVN</span> update --username syk --password syk123 /data/www</span><br><span class="line">    <span class="keyword">if</span> [ $? -eq 0 ]</span><br><span class="line">    <span class="keyword">then</span></span><br><span class="line">        /usr/bin/rsync -az --delete /data/www /tmp/</span><br><span class="line">    <span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
 
@@ -309,7 +310,7 @@
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="http://example.com/2023/09/27/svn/" title="svn 钩子" target="_blank">http://example.com/2023/09/27/svn/</a>
+          <a href="https://syklinux.github.io/2023/09/27/svn/" title="svn 钩子" target="_blank">https://syklinux.github.io/2023/09/27/svn/</a>
         </li>
         
         <li>
@@ -326,6 +327,17 @@
   <div class="article-info article-info-index">
     
     
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
     
 
     
@@ -376,7 +388,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=http://example.com/2023/09/27/svn/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/27/svn/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -426,7 +438,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2018-2023 <a href="http://example.com/" target="_blank">syklinux</a>
+    		&copy; 2018-2023 <a href="https://syklinux.github.io/" target="_blank">syklinux</a>
     	</div>
       	<div class="footer-right">
 			
@@ -535,6 +547,10 @@
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">运维</a>
+              </li>
             
             <div class="clearfix"></div>
           </ul>
