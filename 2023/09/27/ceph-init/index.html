@@ -6,17 +6,24 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://syklinux.github.io">
-  <title>Archives: 2023 | Syklinux的博客</title>
+  <title>ceph 单机部署 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Syklinux的博客">
-<meta property="og:url" content="https://syklinux.github.io/archives/2023/index.html">
+  <meta name="description" content="一、环境 只使用了一台机器，  centos7.2； ceph&#x3D;&#x3D;0.94.10； 6块4T的SAS硬盘，分别做了三个raid1.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ceph 单机部署">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/27/ceph-init/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
+<meta property="og:description" content="一、环境 只使用了一台机器，  centos7.2； ceph&#x3D;&#x3D;0.94.10； 6块4T的SAS硬盘，分别做了三个raid1.">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://syklinux.github.io/images/20180320ceph.png">
+<meta property="article:published_time" content="2023-09-27T08:56:08.000Z">
+<meta property="article:modified_time" content="2023-09-27T09:46:19.866Z">
 <meta property="article:author" content="syklinux">
+<meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://syklinux.github.io/images/20180320ceph.png">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
   
@@ -157,41 +164,167 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-ceph-init" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
   
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2023" class="archive-year">2023</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
+    <h1 class="article-title" itemprop="name">
+      ceph 单机部署
+    </h1>
+  
+
+
+  
+  
+        
+        <span id="busuanzi_container_page_pv" style='display:none' class="archive-article-date">
+              <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
+        </span>
+
 <a href="/2023/09/27/ceph-init/" class="archive-article-date">
         <time datetime="2023-09-27T08:56:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-27</time>
 </a>
 
-        </div>
-    	 
   
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/27/ceph-init/" target="_blank">ceph 单机部署</a>
   
-    </h1>
-  
+    
+<div style="margin-top:10px;">
+  <span class="post-time">
+    <span class="post-meta-item-icon">
+      <!-- fonts.scss -->
+      <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
+      <i class="icon-statistics"></i>
+      <span class="post-meta-item-text"> 字数统计:</span>
+      <span class="post-count">695字</span>
+    </span>
+  </span>
+
+  <span class="post-time">
+    &nbsp; | &nbsp;
+    <span class="post-meta-item-icon">
+      <i class="icon-book icon"></i>
+      <span class="post-meta-item-text"> 阅读时长≈</span>
+      <span class="post-count">3分</span>
+    </span>
+  </span>
+</div>
 
 
-        <div class="article-info info-on-right">
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h4 id="一、环境"><a href="#一、环境" class="headerlink" title="一、环境"></a>一、环境</h4><blockquote>
+<p>只使用了一台机器，</p>
+</blockquote>
+<pre><code>centos7.2；
+ceph==0.94.10；
+6块4T的SAS硬盘，分别做了三个raid1.
+</code></pre>
+<span id="more"></span>
+
+<h4 id="二、安装"><a href="#二、安装" class="headerlink" title="二、安装"></a>二、安装</h4><ul>
+<li>1、设置 hostname 和 hosts (这里使用 cloudstack,hostname 最好不要包含“.”这种特殊字符</li>
+<li>2、设置 ntp 服务，保证时间同步\r\n3、新建一个用户，（ceph</li>
+</ul>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">useradd ceph &amp;&amp; <span class="keyword">echo</span> <span class="string">&quot;ceph&quot;</span> | passwd <span class="params">--stdin</span> ceph</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>4、给 ceph 用户做免密码登录（一台机器也要做)</li>
+<li>5、设置 yum 源（为了方便，就用了国内的源）</li>
+</ul>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[ceph-deploy]</span></span><br><span class="line"><span class="attr">name</span>=ceph-deploy</span><br><span class="line"><span class="attr">baseurl</span>=https://mirrors.aliyun.com/ceph/archive/rpm-firefly/el7/noarch/</span><br><span class="line"><span class="attr">enabled</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">gpgcheck</span>=<span class="number">0</span></span><br><span class="line"><span class="section">[ceph-install]</span></span><br><span class="line"><span class="attr">name</span>=ceph-install</span><br><span class="line"><span class="attr">baseurl</span>=https://mirrors.aliyun.com/ceph/rpm/el7/x<span class="number">86_64</span>/</span><br><span class="line"><span class="attr">enabled</span>=<span class="number">1</span></span><br><span class="line"><span class="attr">gpgcheck</span>=<span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>6、修改 sudo 权限</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;ceph ALL = (root) NOPASSWD:ALL&quot;</span> | <span class="built_in">tee</span> /etc/sudoers.d/ceph</span><br><span class="line"><span class="built_in">chmod</span> 0440 /etc/sudoers.d/ceph</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>7、yum 安装</li>
+</ul>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum update &amp;&amp; yum <span class="keyword">install</span> ceph-deploy</span><br><span class="line">yum <span class="keyword">install</span> openssh-server</span><br><span class="line">yum -y <span class="keyword">install</span> yum-plugin-priorities</span><br><span class="line">yum <span class="keyword">install</span> -y epel-release</span><br><span class="line">yum <span class="keyword">install</span> -y ceph ceph-radosgw</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>8、部署</li>
+</ul>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">su ceph</span><br><span class="line">mkdir myceph/</span><br><span class="line">cd myceph/</span><br><span class="line">ceph-deploy <span class="keyword">new</span> cloudstack</span><br><span class="line">这时在myceph目录下会生成两个文件，在ceph.conf里添加：</span><br><span class="line">osd pool <span class="keyword">default</span> size = <span class="number">1</span> （这里因为做了raid1，而且因为是单机，副本多了后面会有出错）</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>9、初始化 mon，收集密钥</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph<span class="operator">-</span>deploy mon <span class="keyword">create</span><span class="operator">-</span><span class="keyword">initial</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>10、添加 osd：（这里出了很多错误，最后会写出来）我这里是 xfs 格式化了 sdb,sdc,sdd</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p <span class="regexp">/data/</span>ceph&#123;<span class="number">1</span>..<span class="number">3</span>&#125;</span><br><span class="line">mount <span class="regexp">/dev/</span>sdb <span class="regexp">/data/</span>ceph1</span><br><span class="line">mount <span class="regexp">/dev/</span>sdc <span class="regexp">/data/</span>ceph2</span><br><span class="line">mount <span class="regexp">/dev/</span>sdd <span class="regexp">/data/</span>ceph3</span><br><span class="line">ceph-deploy osd prepare cloudstack:<span class="regexp">/data/</span>ceph1 cloudstack:<span class="regexp">/data/</span>ceph2 cloudstack:<span class="regexp">/data/</span>ceph3</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>11、激活 osd 节点</li>
+</ul>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ceph-deploy osd activate cloudstack:<span class="regexp">/data/</span>ceph1 cloudstack:<span class="regexp">/data/</span>ceph2 cloudstack:<span class="regexp">/data/</span>ceph3</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>12、配置</li>
+</ul>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">用 ceph-deploy 把配置文件和 admin 密钥拷贝到管理节点和 Ceph 节点，这样你每次执行 Ceph 命令行时就无需指定<span class="built_in"> monitor </span>地址和 ceph.client.admin.keyring 了</span><br><span class="line"></span><br><span class="line">ceph-deploy admin cloudstack</span><br></pre></td></tr></table></figure>
+
+<p>确保对秘钥环有权限</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod +r <span class="regexp">/etc/</span>ceph/ceph.client.admin.keyring</span><br></pre></td></tr></table></figure>
+
+<p>后面如果修改了 myceph 目录下的 ceph.conf 再 admin 同步会出错，这里就要使用 –overwrite-conf 覆盖，以当前目录的 ceph.conf 为准去覆盖：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ceph-deploy <span class="comment">--overwrite-conf admin cloudstack</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>13、查看状态</li>
+</ul>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">sudo ceph -s</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="错误与解决："><a href="#错误与解决：" class="headerlink" title="错误与解决："></a>错误与解决：</h4><ul>
+<li><p>1、超过 2.2T 的硬盘格式化需要使用 multipath 和 parted</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> 在<span class="regexp">/etc/mu</span>ltipath.conf 下写入：</span><br><span class="line"></span><br><span class="line">blacklist &#123;</span><br><span class="line">	devnode <span class="string">&quot;^sd[a-z]&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"> 重启 multipathd 服务，再格式化</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>2、activate 激活 osd 失败，后面使用 ceph osd tree 发现很多 osd.{0…}down</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">删除down了的osd：</span><br><span class="line"><span class="comment"># 列出所有的OSD</span></span><br><span class="line">ceph osd tree</span><br><span class="line"><span class="comment"># 删除OSD（这里删除osd.0</span></span><br><span class="line">ceph osd out osd.0<span class="built_in"></span></span><br><span class="line"><span class="built_in">service </span>ceph stop osd.0</span><br><span class="line">ceph osd crush <span class="built_in">remove</span> osd.0</span><br><span class="line">ceph auth del osd.0</span><br><span class="line">ceph osd rm 0</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>3、ceph -s 发现是 health HEALTH_WARN，还有很多 degraded stuckunclean undersized：<br><img src="/images/20180320ceph.png"><br>这里是因为上面激活 osd 失败造成的，只要删除自带的 pool 就可以了</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ceph osd lspools或者rados lspools（查看pool，自带的是RBD）</span><br><span class="line">ceph osd pool <span class="built_in">delete</span> rbd rbd <span class="comment">--yes-i-really-really-mean-it（删除pool）</span></span><br><span class="line"><span class="comment">#创建一个新的rbd</span></span><br><span class="line">ceph osd pool <span class="built_in">create</span> rbd <span class="number">96</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+
+    
+
+    
+
+    
+    <div class="declare"> 
+      <ul class="post-copyright">
+        <li>
+          <strong>本文作者：</strong>
+          syklinux
+        </li>
+        <li>
+          <strong>本文链接：</strong>
+          <a href="https://syklinux.github.io/2023/09/27/ceph-init/" title="ceph 单机部署" target="_blank">https://syklinux.github.io/2023/09/27/ceph-init/</a>
+        </li>
+        
+        <li>
+          <strong>版权声明： </strong>
           
+          本博客所有文章除特别声明外，均采用 <a href="https://github.com/JoeyBling/hexo-theme-yilia-plus/blob/master/LICENSE" rel="external nofollow" target="_blank">MIT</a> 许可协议。转载请注明出处！
+        </li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -203,62 +336,107 @@
 		</ul>
 	</div>
 
-          
+    
 
+    
+
+    
+    
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <!-- <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a> -->
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/27/ceph-init/" alt="微信分享二维码"> -->
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+
+    
+    <div class="clearfix"></div>
+  </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2023/09/27/svn/" class="archive-article-date">
-        <time datetime="2023-09-27T07:57:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-27</time>
-</a>
 
+
+<nav id="article-nav">
+  
+  
+    <a href="/2023/09/27/svn/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">svn 钩子</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/27/svn/" target="_blank">svn 钩子</a>
-  
-    </h1>
-  
+        
+        
+    </div>
+</aside>
 
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		
-		</ul>
-	</div>
 
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
 
-    
+
+
+
+
+
+
+
 
 
           </div>
@@ -299,8 +477,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,

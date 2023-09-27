@@ -18,7 +18,7 @@
 <meta property="og:description" content="钩子脚本就是 shell 的写法，钩子就是被某些版本库事件触发的程序。  一、svn 钩子钩子脚本就是shell的写法，钩子就是被某些版本库事件触发的程序。  常用钩子： post-commit在提交完成成功创建之后执行该钩子。（提交已经完成，不可更改) 更新之后，通过邮件、微信通知、更新触发 checkout 程序、然后推送到服务器 pre-commit提交完成前触发执行该脚本。限制上传文件的">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-27T07:57:28.000Z">
-<meta property="article:modified_time" content="2023-09-27T08:30:56.439Z">
+<meta property="article:modified_time" content="2023-09-27T09:04:53.545Z">
 <meta property="article:author" content="syklinux">
 <meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary">
@@ -78,8 +78,6 @@
 			
 				<li><a href="https://syklinux.github.io/" target="_blank">技术笔记</a></li>
 			
-				<li><a href="/tags/%E9%9A%8F%E7%AC%94/" target="_blank">随笔</a></li>
-			
 			</ul>
 		</nav>
 		<nav class="header-smart-menu">
@@ -96,26 +94,6 @@
 		<nav class="header-nav">
 			<div class="social">
 				
-					
-						<a class="github" href="#" 
-												title="GitHub" target="_blank"><i class="icon-github"></i></a>
-					
-				
-					
-						<a class="github" href="#" 
-												title="GitHub" target="_blank"><i class="icon-github"></i></a>
-					
-				
-					
-						<a class="gitee" href="#" 
-												title="码云" target="_blank"><i class="icon-gitee"></i></a>
-					
-				
-					
-						<a class="jianshu" href="#" 
-												title="简书" target="_blank"><i class="icon-jianshu"></i></a>
-					
-				
 			</div>
 		
 		</nav>
@@ -126,10 +104,10 @@
     <div class="mid-col" q-class="show:isShow,hide:isShow|isFalse">
       
       
-      <a class="forkMe" style="position:absolute;z-index:999;top:0;right:0.5em;" 
+      <!-- <a class="forkMe" style="position:absolute;z-index:999;top:0;right:0.5em;" 
         href="https://github.com/JoeyBling/hexo-theme-yilia-plus" target="_blank">
         <img src="/img/forkme.png"
-          class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
+          class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a> -->
       
       
 <nav id="mobile-nav">
@@ -154,45 +132,21 @@
 			
 				
 			
-				
-			
 			
 			
 			<nav class="header-nav">
 				<div class="social">
 					
-						
-						<a class="github" target="_blank" 
-							href="#" title="GitHub"><i class="icon-github"></i></a>
-						
-					
-						
-						<a class="github" target="_blank" 
-							href="#" title="GitHub"><i class="icon-github"></i></a>
-						
-					
-						
-						<a class="gitee" target="_blank" 
-							href="#" title="码云"><i class="icon-gitee"></i></a>
-						
-					
-						
-						<a class="jianshu" target="_blank" 
-							href="#" title="简书"><i class="icon-jianshu"></i></a>
-						
-					
 				</div>
 			</nav>
 
 			<nav class="header-menu js-header-menu">
-				<ul style="width: 70%">
+				<ul style="width: 50%">
 				
 				
-					<li style="width: 33.333333333333336%"><a href="/">主页</a></li>
+					<li style="width: 50%"><a href="/">主页</a></li>
 		        
-					<li style="width: 33.333333333333336%"><a href="https://syklinux.github.io/">技术笔记</a></li>
-		        
-					<li style="width: 33.333333333333336%"><a href="/tags/%E9%9A%8F%E7%AC%94/">随笔</a></li>
+					<li style="width: 50%"><a href="https://syklinux.github.io/">技术笔记</a></li>
 		        
 				</ul>
 			</nav>
@@ -270,6 +224,8 @@
 <li>post-commit<br>在提交完成成功创建之后执行该钩子。（提交已经完成，不可更改) 更新之后，通过邮件、微信通知、更新触发 checkout 程序、然后推送到服务器</li>
 <li>pre-commit<br>提交完成前触发执行该脚本。限制上传文件的大小和拓展名，控制提交要输入的信息</li>
 </ul>
+<span id="more"></span>
+
 <h4 id="下面写一个小例子：-rsync-与-svn-钩子结合实现数据实时同步到服务器"><a href="#下面写一个小例子：-rsync-与-svn-钩子结合实现数据实时同步到服务器" class="headerlink" title="下面写一个小例子： rsync 与 svn 钩子结合实现数据实时同步到服务器"></a>下面写一个小例子： rsync 与 svn 钩子结合实现数据实时同步到服务器</h4><ul>
 <li>1、建立同步 web 目录</li>
 </ul>
@@ -401,6 +357,20 @@
 </article>
 
 
+<nav id="article-nav">
+  
+    <a href="/2023/09/27/ceph-init/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          ceph 单机部署
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -493,10 +463,10 @@
   var titleTime;
   document.addEventListener("visibilitychange", function () {
     if (document.hidden) {
-      document.title = "(つェ⊂) 我藏好了哦~ " + originTitle;
+      document.title = "一个死宅的博客" + originTitle;
       clearTimeout(titleTime);
     } else {
-      document.title = "(*´∇｀*) 被你发现啦~ " + originTitle;
+      document.title = "一个死宅的博客" + originTitle;
       titleTime = setTimeout(function () {
         document.title = originTitle;
       }, 2000);
