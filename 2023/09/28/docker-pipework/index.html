@@ -6,17 +6,25 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://syklinux.github.io">
-  <title>Archives: 2023 | Syklinux的博客</title>
+  <title>docker容器—PIPEWORK解读与实践 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Syklinux的博客">
-<meta property="og:url" content="https://syklinux.github.io/archives/2023/index.html">
+  <meta name="description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker容器—PIPEWORK解读与实践">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/28/docker-pipework/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
+<meta property="og:description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
+<meta property="article:published_time" content="2023-09-28T02:15:04.000Z">
+<meta property="article:modified_time" content="2023-09-28T02:19:44.933Z">
 <meta property="article:author" content="syklinux">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="docker">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
   
@@ -157,41 +165,162 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="post-docker-pipework" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
   
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2023" class="archive-year">2023</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
+    <h1 class="article-title" itemprop="name">
+      docker容器—PIPEWORK解读与实践
+    </h1>
+  
+
+
+  
+  
+        
+        <span id="busuanzi_container_page_pv" style='display:none' class="archive-article-date">
+              <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
+        </span>
+
 <a href="/2023/09/28/docker-pipework/" class="archive-article-date">
         <time datetime="2023-09-28T02:15:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
 </a>
 
-        </div>
-    	 
   
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/28/docker-pipework/" target="_blank">docker容器—PIPEWORK解读与实践</a>
   
-    </h1>
-  
+    
+<div style="margin-top:10px;">
+  <span class="post-time">
+    <span class="post-meta-item-icon">
+      <!-- fonts.scss -->
+      <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
+      <i class="icon-statistics"></i>
+      <span class="post-meta-item-text"> 字数统计:</span>
+      <span class="post-count">1.3k字</span>
+    </span>
+  </span>
+
+  <span class="post-time">
+    &nbsp; | &nbsp;
+    <span class="post-meta-item-icon">
+      <i class="icon-book icon"></i>
+      <span class="post-meta-item-text"> 阅读时长≈</span>
+      <span class="post-count">5分</span>
+    </span>
+  </span>
+</div>
 
 
-        <div class="article-info info-on-right">
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <blockquote>
+<p>本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。</p>
+</blockquote>
+<ul>
+<li>1、pipework 的使用以及源码分析<br>Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改善 Docker 的网络功能，如 pipework、weave、flannel 等。这里，就先介绍一下 pipework 的使用和工作原理。<br>pipework 是由 Docker 的工程师 JérmePetazzoni 开发的一个 Docker 网络配置工具，由 200 多行 shell 实现，方便易用。下面用三个场景来演示 pipework 的使用和工作原理。</li>
+</ul>
+<span id="more"></span>
+
+<ul>
+<li>1.1、将 Docker 容器配置到本地网络环境中</li>
+</ul>
+<p>为了使本地网络中的机器和 Docker 容器更方便的通信，我们经常会有将 Docker 容器配置到和主机同一网段的需求。这个需求其实很容易实现，我们只要将 Docker 容器和主机的网卡桥接起来，再给 Docker 容器配上 IP 就可以了。</p>
+<p>下面我们来操作一下，</p>
+<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主机 <span class="keyword">A</span> 地址为<span class="number">192.168.137.100</span>/<span class="number">24</span></span><br><span class="line">网关为 <span class="number">192.168.137.1</span></span><br><span class="line">需要给 Docker 容器的地址配置为 <span class="number">192.168.137.150</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
+
+<p>在主机 A 上做如下操作：</p>
+<h4 id="安装-pipework"><a href="#安装-pipework" class="headerlink" title="安装 pipework"></a>安装 pipework</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/jpetazzo/</span>pipework</span><br><span class="line">cp ~<span class="regexp">/pipework/</span>pipework <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span></span><br></pre></td></tr></table></figure>
+
+<p>启动 Docker 容器</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
+
+<p>配置容器网络，并连到网桥 br0 上。网关在 IP 地址后面加@指定。若主机环境中存在 dhcp 服务器，也可以通过 dhcp 的方式获取 IP</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> br0 test1 dhcp</span><br><span class="line"><span class="attribute">pipework</span> br0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span>@<span class="number">192.168.137.1</span></span><br></pre></td></tr></table></figure>
+
+<p>将主机 eth0 桥接到 br0 上，并把 eth0 的 IP 配置在 br0 上。这里由于是远程操作，中间网络会断掉，所以放在一条命令中执行.</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> addr add <span class="number">192.168.137.100</span>/<span class="number">24</span> dev br0;</span><br><span class="line"><span class="attribute">ip</span> addr del <span class="number">192.168.137.100</span>/<span class="number">24</span> dev eth0;</span><br><span class="line"><span class="attribute">brctl</span> addif br0 eth0;</span><br><span class="line"><span class="attribute">ip</span> route del default;</span><br><span class="line"><span class="attribute">ip</span> route add default gw <span class="number">192.168.137.1</span> dev br0</span><br></pre></td></tr></table></figure>
+
+<p>这时可以 ifconfig 看一下：（截取不完，只截取需要的）</p>
+<p><img src="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg" alt="active"></p>
+<ul>
+<li><p>2.2、单主机 Docker 容器 VLAN 划分<br>pipework 不仅可以使用 Linux bridge 连接 Docker 容器，还可以与 OpenVswitch 结合，实现 Docker 容器的 VLAN 划分。为了演示隔离效果，我们将 4 个容器放在了同一个 IP 网段中。但实际他们是二层隔离的两个网络，有不同的广播域。</p>
+<p>在主机 A 上创建 4 个 Docker 容器，test1、test2、test3、test4</p>
+</li>
+</ul>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test3 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test4 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
+
+<p>将 test1，test2 划分到一个 vlan 中，vlan 在 mac 地址后加@指定，此处 mac 地址省略。</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">100</span></span><br></pre></td></tr></table></figure>
+
+<p>将 test3，test4 划分到另一个 vlan 中</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">200</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
+
+<p>完成上述操作后，使用 docker attach 连到容器中，然后用 ping 命令测试连通性，发现 test1 和 test2 可以相互通信，但与 test3 和 test4 隔离。这样，一个简单的 VLAN 隔离容器网络就已经完成。</p>
+<ul>
+<li>2.3、多主机 Docker 容器的 VLAN 划分</li>
+</ul>
+<p>为了实现这个目的，我们把宿主机上的网卡桥接到各自的 OVS 网桥上，然后再为容器配置 IP 和 VLAN 就可以了。<br>我们实验环境如下:</p>
+<blockquote>
+<p>主机 A 和 B 各有一块网卡 eth0，IP 地址分别为 192.168.137.100&#x2F;24，192.168.137.101&#x2F;24。<br>在主机 A 上创建两个容器 test1、test2，分别在 VLAN 100 和 VLAN 200 上。<br>在主机 B 上创建 test3、test4，分别在 VLAN 100 和 VLAN 200 上。<br>最终，test1 可以和 test3 通信，test2 可以和 test4 通信。</p>
+</blockquote>
+<h5 id="在主机-A-上"><a href="#在主机-A-上" class="headerlink" title="在主机 A 上"></a>在主机 A 上</h5><p>创建 Docker 容器</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
+
+<p>划分 VLAN</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
+
+<p>将 eth0 桥接到 ovs0 上</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.100/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.100/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1dev ovs0</span><br></pre></td></tr></table></figure>
+
+<h5 id="在主机-B-上"><a href="#在主机-B-上" class="headerlink" title="在主机 B 上"></a>在主机 B 上</h5><p>创建 Docker 容器</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> run -itd --name test3 centos /bin/bash</span><br><span class="line"><span class="attribute">docker</span> run -itd --name test4 centos /bin/bash</span><br><span class="line"><span class="comment">#划分VLAN</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
+
+<p>将 eth0 桥接到 ovs0 上</p>
+<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.101/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.101/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1 dev ovs0</span><br></pre></td></tr></table></figure>
+
+<p>完成上面的步骤后</p>
+<blockquote>
+<p>主机 A 上的 test1 和主机 B 上的 test3 容器就划分到了一个 VLAN 中，<br>并且与主机 A 上的 test2 和主机 B 上的 test4 隔离（主机 eth0 网卡需要设置为混杂模式，连接主机的交换机端口应设置为 trunk 模式，即允许 VLAN 100 和 VLAN 200 的包通过）。</p>
+</blockquote>
+<blockquote>
+<p>除此之外，pipework 还支持使用 macvlan 设备、设置网卡 MAC 地址等功能。不过，pipework 有一个缺陷，就是配置的容器在关掉重启后，之前的设置会丢失。</p>
+</blockquote>
+
+    
+
+    
+
+    
+    <div class="declare"> 
+      <ul class="post-copyright">
+        <li>
+          <strong>本文作者：</strong>
+          syklinux
+        </li>
+        <li>
+          <strong>本文链接：</strong>
+          <a href="https://syklinux.github.io/2023/09/28/docker-pipework/" title="docker容器—PIPEWORK解读与实践" target="_blank">https://syklinux.github.io/2023/09/28/docker-pipework/</a>
+        </li>
+        
+        <li>
+          <strong>版权声明： </strong>
           
+          本博客所有文章除特别声明外，均采用 <a href="https://github.com/JoeyBling/hexo-theme-yilia-plus/blob/master/LICENSE" rel="external nofollow" target="_blank">MIT</a> 许可协议。转载请注明出处！
+        </li>
+        
+      </ul>
+    </div>
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -207,203 +336,107 @@
 		</ul>
 	</div>
 
-          
+    
 
+    
+
+    
+    
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <!-- <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a> -->
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/docker-pipework/" alt="微信分享二维码"> -->
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+
+    
+    <div class="clearfix"></div>
+  </div>
   </div>
 </article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2023/09/28/docker-net/" class="archive-article-date">
-        <time datetime="2023-09-28T02:05:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
-</a>
 
+
+<nav id="article-nav">
+  
+  
+    <a href="/2023/09/28/docker-net/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">docker容器—网络模式</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/28/docker-net/" target="_blank">docker容器—网络模式</a>
-  
-    </h1>
-  
+        
+        
+    </div>
+</aside>
 
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2023/09/28/ceph-fault/" class="archive-article-date">
-        <time datetime="2023-09-28T01:52:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/28/ceph-fault/" target="_blank">ceph故障处理，更换硬盘</a>
-  
-    </h1>
-  
 
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">ceph</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2023/09/27/ceph-init/" class="archive-article-date">
-        <time datetime="2023-09-27T08:56:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-27</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/27/ceph-init/" target="_blank">ceph 单机部署</a>
-  
-    </h1>
-  
 
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">ceph</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	
-<a href="/2023/09/27/svn/" class="archive-article-date">
-        <time datetime="2023-09-27T07:57:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-27</time>
-</a>
-
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-	
-	  <a class="archive-article-title" href="/2023/09/27/svn/" target="_blank">svn 钩子</a>
-  
-    </h1>
-  
 
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		
-		</ul>
-	</div>
 
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
 
-    
+
 
 
           </div>
@@ -444,8 +477,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: true,

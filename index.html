@@ -164,6 +164,296 @@
             
 
   
+    <article id="post-docker-pipework" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/docker-pipework/" target="_blank">docker容器—PIPEWORK解读与实践</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/docker-pipework/" class="archive-article-date">
+        <time datetime="2023-09-28T02:15:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <blockquote>
+<p>本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。</p>
+</blockquote>
+<ul>
+<li>1、pipework 的使用以及源码分析<br>Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改善 Docker 的网络功能，如 pipework、weave、flannel 等。这里，就先介绍一下 pipework 的使用和工作原理。<br>pipework 是由 Docker 的工程师 JérmePetazzoni 开发的一个 Docker 网络配置工具，由 200 多行 shell 实现，方便易用。下面用三个场景来演示 pipework 的使用和工作原理。</li>
+</ul>
+    
+    <a class="article-more-a" href="/2023/09/28/docker-pipework/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/docker-pipework/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-docker-net" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/docker-net/" target="_blank">docker容器—网络模式</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/docker-net/" class="archive-article-date">
+        <time datetime="2023-09-28T02:05:48.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <blockquote>
+<p>Docker 作为目前最火的轻量级容器技术，有很多令人称道的功能，如 Docker 的镜像管理。</p>
+</blockquote>
+<p>然而，Docker 同样有着很多不完善的地方，网络方面就是 Docker 比较薄弱的部分。因此，我们有必要深入了解 Docker 的网络知识，以满足更高的网络需求。这里先介绍 Docker 自身的 4 种网络工作方式。</p>
+<ul>
+<li>1、 Docker 的 4 种网络模式<br>我们在使用 docker run 创建 Docker 容器时，可以用–net 选项指定容器的网络模式，Docker 有以下 4 种网络模式：</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">§ host模式，使用<span class="attribute">--net</span>=host指定。</span><br><span class="line">§ container模式，使用<span class="attribute">--net</span>=container:NAME_or_ID指定。</span><br><span class="line">§ none模式，使用<span class="attribute">--net</span>=none指定。</span><br><span class="line">§ bridge模式，使用<span class="attribute">--net</span>=bridge指定，默认设置。</span><br></pre></td></tr></table></figure>
+    
+    <a class="article-more-a" href="/2023/09/28/docker-net/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/docker-net/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-ceph-fault" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/ceph-fault/" target="_blank">ceph故障处理，更换硬盘</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/ceph-fault/" class="archive-article-date">
+        <time datetime="2023-09-28T01:52:06.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <blockquote>
+<p>ceph -s 发现 health 为 HEALTH_WRANING 时说明集群出现了一定的问题。<br><img src="/images/20180911.png"></p>
+</blockquote>
+    
+    <a class="article-more-a" href="/2023/09/28/ceph-fault/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">ceph</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/ceph-fault/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-ceph-init" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -219,6 +509,10 @@ ceph==0.94.10；
 			 
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">ceph</a>
         		</li>
       		
 		</ul>
@@ -476,6 +770,14 @@ ceph==0.94.10；
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">运维</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">ceph</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">docker</a>
               </li>
             
             <div class="clearfix"></div>
