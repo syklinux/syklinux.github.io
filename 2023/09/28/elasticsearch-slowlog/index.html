@@ -6,25 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://syklinux.github.io">
-  <title>docker容器—PIPEWORK解读与实践 | Syklinux的博客</title>
+  <title>elasticsearch开启慢查询日志 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+  <meta name="description" content="es 查询一下需要 5s、10s 甚至更长？es 里面的操作，主要分为两种，一种写入（增删改），另一种是查询（搜索）。我们分别要识别出来，哪些写入操作性能比较慢，哪些查询操作性能比较慢，先要识别出来有性能问题的这些慢查询，慢写入，然后才能去考虑如何优化写入的性能，如何优化搜索的性能。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker容器—PIPEWORK解读与实践">
-<meta property="og:url" content="https://syklinux.github.io/2023/09/28/docker-pipework/index.html">
+<meta property="og:title" content="elasticsearch开启慢查询日志">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/28/elasticsearch-slowlog/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
-<meta property="og:description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+<meta property="og:description" content="es 查询一下需要 5s、10s 甚至更长？es 里面的操作，主要分为两种，一种写入（增删改），另一种是查询（搜索）。我们分别要识别出来，哪些写入操作性能比较慢，哪些查询操作性能比较慢，先要识别出来有性能问题的这些慢查询，慢写入，然后才能去考虑如何优化写入的性能，如何优化搜索的性能。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
-<meta property="article:published_time" content="2023-09-28T02:15:04.000Z">
-<meta property="article:modified_time" content="2023-09-28T06:42:57.847Z">
+<meta property="article:published_time" content="2023-09-28T06:19:20.000Z">
+<meta property="article:modified_time" content="2023-09-28T06:42:31.887Z">
 <meta property="article:author" content="syklinux">
 <meta property="article:tag" content="运维">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="elasticsearch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
   
@@ -165,14 +163,14 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-docker-pipework" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-elasticsearch-slowlog" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
   
   
     <h1 class="article-title" itemprop="name">
-      docker容器—PIPEWORK解读与实践
+      elasticsearch开启慢查询日志
     </h1>
   
 
@@ -184,8 +182,8 @@
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/2023/09/28/docker-pipework/" class="archive-article-date">
-        <time datetime="2023-09-28T02:15:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+<a href="/2023/09/28/elasticsearch-slowlog/" class="archive-article-date">
+        <time datetime="2023-09-28T06:19:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
 </a>
 
   
@@ -198,7 +196,7 @@
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">1.3k字</span>
+      <span class="post-count">811字</span>
     </span>
   </span>
 
@@ -207,7 +205,7 @@
     <span class="post-meta-item-icon">
       <i class="icon-book icon"></i>
       <span class="post-meta-item-text"> 阅读时长≈</span>
-      <span class="post-count">5分</span>
+      <span class="post-count">3分</span>
     </span>
   </span>
 </div>
@@ -218,78 +216,28 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <blockquote>
-<p>本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。</p>
-</blockquote>
-<ul>
-<li>1、pipework 的使用以及源码分析<br>Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改善 Docker 的网络功能，如 pipework、weave、flannel 等。这里，就先介绍一下 pipework 的使用和工作原理。<br>pipework 是由 Docker 的工程师 JérmePetazzoni 开发的一个 Docker 网络配置工具，由 200 多行 shell 实现，方便易用。下面用三个场景来演示 pipework 的使用和工作原理。</li>
-</ul>
+    <h2 id="es-查询一下需要-5s、10s-甚至更长？"><a href="#es-查询一下需要-5s、10s-甚至更长？" class="headerlink" title="es 查询一下需要 5s、10s 甚至更长？"></a>es 查询一下需要 5s、10s 甚至更长？</h2><p>es 里面的操作，主要分为两种，一种写入（增删改），另一种是查询（搜索）。<br>我们分别要识别出来，哪些写入操作性能比较慢，哪些查询操作性能比较慢，先要识别出来有性能问题的这些慢查询，慢写入，然后才能去考虑如何优化写入的性能，如何优化搜索的性能。</p>
 <span id="more"></span>
 
-<ul>
-<li>1.1、将 Docker 容器配置到本地网络环境中</li>
-</ul>
-<p>为了使本地网络中的机器和 Docker 容器更方便的通信，我们经常会有将 Docker 容器配置到和主机同一网段的需求。这个需求其实很容易实现，我们只要将 Docker 容器和主机的网卡桥接起来，再给 Docker 容器配上 IP 就可以了。</p>
-<p>下面我们来操作一下，</p>
-<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主机 <span class="keyword">A</span> 地址为<span class="number">192.168.137.100</span>/<span class="number">24</span></span><br><span class="line">网关为 <span class="number">192.168.137.1</span></span><br><span class="line">需要给 Docker 容器的地址配置为 <span class="number">192.168.137.150</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
+<h2 id="搜索慢查询日志"><a href="#搜索慢查询日志" class="headerlink" title="搜索慢查询日志"></a>搜索慢查询日志</h2><p>无论是慢查询日志，还是慢写入日志，都是针对 shard 级别的，因为大家应该知道，无论你是执行增删改，还是执行搜索，都是对某个数据执行写入或者是搜索，其实都是到某个 shard 上面去执行的。</p>
+<p>shard 上面执行的慢的写入或者是搜索，都会记录在针对这个 shard 的日志中。</p>
+<p>阈值的意思，就是说，什么叫做慢？搜索，5s 叫做慢？还是 10s 叫做慢？或者是 1s 叫做慢？</p>
+<p>比如说，你设置一个阈值，5s 就是搜索的阈值，5s 就叫做慢，那么一旦一个搜索请求超过了 5s 之后，就会记录一条慢搜索日志到日志文件中。</p>
+<p>shard level 的搜索慢查询日志，辉将搜索性能较慢的查询写入一个专门的日志文件中。可以针对 query phase 和 fetch phase 单独设置慢查询的阈值，而具体的慢查询阈值设置如下所示：</p>
+<p>在 elasticsearch.yml 中，设置</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.query</span><span class="selector-class">.warn</span>: <span class="number">10s</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.query</span><span class="selector-class">.info</span>: <span class="number">5s</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.query</span><span class="selector-class">.debug</span>: <span class="number">2s</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.query</span><span class="selector-class">.trace</span>: <span class="number">500ms</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.fetch</span><span class="selector-class">.warn</span>: <span class="number">1s</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.fetch</span><span class="selector-class">.info</span>: <span class="number">800ms</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.fetch</span><span class="selector-class">.debug</span>: <span class="number">500ms</span></span><br><span class="line">index<span class="selector-class">.search</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.fetch</span><span class="selector-class">.trace</span>: <span class="number">200ms</span></span><br></pre></td></tr></table></figure>
 
-<p>在主机 A 上做如下操作：</p>
-<h4 id="安装-pipework"><a href="#安装-pipework" class="headerlink" title="安装 pipework"></a>安装 pipework</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/jpetazzo/</span>pipework</span><br><span class="line">cp ~<span class="regexp">/pipework/</span>pipework <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span></span><br></pre></td></tr></table></figure>
+<p>而慢查询日志具体的格式，都是在 log4j2.properties 中配置的，比如下面的配置：</p>
+<figure class="highlight roboconf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">appender.index_search_slowlog_rolling.type = RollingFile</span><br><span class="line">appender.index_search_slowlog_rolling.name = index_search_slowlog_rolling</span><br><span class="line">appender.index_search_slowlog_rolling.fileName = $&#123;<span class="attribute">sys</span>:es<span class="variable">.logs</span>&#125;_index_search_slowlog<span class="variable">.log</span></span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.layout</span><span class="variable">.type</span> = PatternLayout</span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.layout</span><span class="variable">.pattern</span> = [%d&#123;ISO8601&#125;][%-5p][%-25c] %.10000m%n</span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.filePattern</span> = $&#123;sys:es<span class="variable">.logs</span>&#125;_index_search_slowlog-%d&#123;yyyy-MM-dd&#125;<span class="variable">.log</span></span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.type</span> = Policies</span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.time</span><span class="variable">.type</span> = TimeBasedTriggeringPolicy</span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.time</span><span class="variable">.interval</span> = 1</span><br><span class="line">appender<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.time</span><span class="variable">.modulate</span> = true</span><br><span class="line">logger<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.name</span> = index<span class="variable">.search</span><span class="variable">.slowlog</span></span><br><span class="line">logger<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.level</span> = trace</span><br><span class="line">logger<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.appenderRef</span><span class="variable">.index_search_slowlog_rolling</span><span class="variable">.ref</span> = index_search_slowlog_rolling</span><br><span class="line">logger<span class="variable">.index_search_slowlog_rolling</span><span class="variable">.additivity</span> = false</span><br></pre></td></tr></table></figure>
 
-<p>启动 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
+<h2 id="索引慢写入日志"><a href="#索引慢写入日志" class="headerlink" title="索引慢写入日志"></a>索引慢写入日志</h2><p>可以用如下的配置来设置索引写入慢日志的阈值：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">index<span class="selector-class">.indexing</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.index</span><span class="selector-class">.warn</span>: <span class="number">10s</span></span><br><span class="line">index<span class="selector-class">.indexing</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.index</span><span class="selector-class">.info</span>: <span class="number">5s</span></span><br><span class="line">index<span class="selector-class">.indexing</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.index</span><span class="selector-class">.debug</span>: <span class="number">2s</span></span><br><span class="line">index<span class="selector-class">.indexing</span><span class="selector-class">.slowlog</span><span class="selector-class">.threshold</span><span class="selector-class">.index</span><span class="selector-class">.trace</span>: <span class="number">500ms</span></span><br><span class="line">index<span class="selector-class">.indexing</span><span class="selector-class">.slowlog</span><span class="selector-class">.level</span>: info</span><br><span class="line">index<span class="selector-class">.indexing</span><span class="selector-class">.slowlog</span><span class="selector-class">.source</span>: <span class="number">1000</span></span><br></pre></td></tr></table></figure>
 
-<p>配置容器网络，并连到网桥 br0 上。网关在 IP 地址后面加@指定。若主机环境中存在 dhcp 服务器，也可以通过 dhcp 的方式获取 IP</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> br0 test1 dhcp</span><br><span class="line"><span class="attribute">pipework</span> br0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span>@<span class="number">192.168.137.1</span></span><br></pre></td></tr></table></figure>
+<p>用下面的 log4j.properties 配置就可以设置索引慢写入日志的格式：</p>
+<figure class="highlight roboconf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">appender.index_indexing_slowlog_rolling.type = RollingFile</span><br><span class="line">appender.index_indexing_slowlog_rolling.name = index_indexing_slowlog_rolling</span><br><span class="line">appender.index_indexing_slowlog_rolling.fileName = $&#123;<span class="attribute">sys</span>:es<span class="variable">.logs</span>&#125;_index_indexing_slowlog<span class="variable">.log</span></span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.layout</span><span class="variable">.type</span> = PatternLayout</span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.layout</span><span class="variable">.pattern</span> = [%d&#123;ISO8601&#125;][%-5p][%-25c] %marker%.10000m%n</span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.filePattern</span> = $&#123;sys:es<span class="variable">.logs</span>&#125;_index_indexing_slowlog-%d&#123;yyyy-MM-dd&#125;<span class="variable">.log</span></span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.type</span> = Policies</span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.time</span><span class="variable">.type</span> = TimeBasedTriggeringPolicy</span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.time</span><span class="variable">.interval</span> = 1</span><br><span class="line">appender<span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.policies</span><span class="variable">.time</span><span class="variable">.modulate</span> = true</span><br><span class="line"></span><br><span class="line">logger<span class="variable">.index_indexing_slowlog</span><span class="variable">.name</span> = index<span class="variable">.indexing</span><span class="variable">.slowlog</span><span class="variable">.index</span></span><br><span class="line">logger<span class="variable">.index_indexing_slowlog</span><span class="variable">.level</span> = trace</span><br><span class="line">logger<span class="variable">.index_indexing_slowlog</span><span class="variable">.appenderRef</span><span class="variable">.index_indexing_slowlog_rolling</span><span class="variable">.ref</span> = index_indexing_slowlog_rolling</span><br><span class="line">logger<span class="variable">.index_indexing_slowlog</span><span class="variable">.additivity</span> = false</span><br></pre></td></tr></table></figure>
 
-<p>将主机 eth0 桥接到 br0 上，并把 eth0 的 IP 配置在 br0 上。这里由于是远程操作，中间网络会断掉，所以放在一条命令中执行.</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> addr add <span class="number">192.168.137.100</span>/<span class="number">24</span> dev br0;</span><br><span class="line"><span class="attribute">ip</span> addr del <span class="number">192.168.137.100</span>/<span class="number">24</span> dev eth0;</span><br><span class="line"><span class="attribute">brctl</span> addif br0 eth0;</span><br><span class="line"><span class="attribute">ip</span> route del default;</span><br><span class="line"><span class="attribute">ip</span> route add default gw <span class="number">192.168.137.1</span> dev br0</span><br></pre></td></tr></table></figure>
-
-<p>这时可以 ifconfig 看一下：（截取不完，只截取需要的）</p>
-<p><img src="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg" alt="active"></p>
-<ul>
-<li><p>2.2、单主机 Docker 容器 VLAN 划分<br>pipework 不仅可以使用 Linux bridge 连接 Docker 容器，还可以与 OpenVswitch 结合，实现 Docker 容器的 VLAN 划分。为了演示隔离效果，我们将 4 个容器放在了同一个 IP 网段中。但实际他们是二层隔离的两个网络，有不同的广播域。</p>
-<p>在主机 A 上创建 4 个 Docker 容器，test1、test2、test3、test4</p>
-</li>
-</ul>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test3 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test4 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test1，test2 划分到一个 vlan 中，vlan 在 mac 地址后加@指定，此处 mac 地址省略。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">100</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test3，test4 划分到另一个 vlan 中</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">200</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>完成上述操作后，使用 docker attach 连到容器中，然后用 ping 命令测试连通性，发现 test1 和 test2 可以相互通信，但与 test3 和 test4 隔离。这样，一个简单的 VLAN 隔离容器网络就已经完成。</p>
-<ul>
-<li>2.3、多主机 Docker 容器的 VLAN 划分</li>
-</ul>
-<p>为了实现这个目的，我们把宿主机上的网卡桥接到各自的 OVS 网桥上，然后再为容器配置 IP 和 VLAN 就可以了。<br>我们实验环境如下:</p>
-<blockquote>
-<p>主机 A 和 B 各有一块网卡 eth0，IP 地址分别为 192.168.137.100&#x2F;24，192.168.137.101&#x2F;24。<br>在主机 A 上创建两个容器 test1、test2，分别在 VLAN 100 和 VLAN 200 上。<br>在主机 B 上创建 test3、test4，分别在 VLAN 100 和 VLAN 200 上。<br>最终，test1 可以和 test3 通信，test2 可以和 test4 通信。</p>
-</blockquote>
-<h5 id="在主机-A-上"><a href="#在主机-A-上" class="headerlink" title="在主机 A 上"></a>在主机 A 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>划分 VLAN</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.100/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.100/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1dev ovs0</span><br></pre></td></tr></table></figure>
-
-<h5 id="在主机-B-上"><a href="#在主机-B-上" class="headerlink" title="在主机 B 上"></a>在主机 B 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> run -itd --name test3 centos /bin/bash</span><br><span class="line"><span class="attribute">docker</span> run -itd --name test4 centos /bin/bash</span><br><span class="line"><span class="comment">#划分VLAN</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.101/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.101/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1 dev ovs0</span><br></pre></td></tr></table></figure>
-
-<p>完成上面的步骤后</p>
-<blockquote>
-<p>主机 A 上的 test1 和主机 B 上的 test3 容器就划分到了一个 VLAN 中，<br>并且与主机 A 上的 test2 和主机 B 上的 test4 隔离（主机 eth0 网卡需要设置为混杂模式，连接主机的交换机端口应设置为 trunk 模式，即允许 VLAN 100 和 VLAN 200 的包通过）。</p>
-</blockquote>
-<blockquote>
-<p>除此之外，pipework 还支持使用 macvlan 设备、设置网卡 MAC 地址等功能。不过，pipework 有一个缺陷，就是配置的容器在关掉重启后，之前的设置会丢失。</p>
-</blockquote>
+<p>把这个东西记录好了以后，就可以什么呢？</p>
+<p>es 集群运维管理员，就需要经常每天去看看，正常情况下，慢查询应该是比较少数的。所以比如你每天检查一次，如果发现某个查询特别慢，就要通知写这个查询的 RD，开发人员，让他们去优化一下性能。</p>
 
     
 
@@ -304,7 +252,7 @@
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="https://syklinux.github.io/2023/09/28/docker-pipework/" title="docker容器—PIPEWORK解读与实践" target="_blank">https://syklinux.github.io/2023/09/28/docker-pipework/</a>
+          <a href="https://syklinux.github.io/2023/09/28/elasticsearch-slowlog/" title="elasticsearch开启慢查询日志" target="_blank">https://syklinux.github.io/2023/09/28/elasticsearch-slowlog/</a>
         </li>
         
         <li>
@@ -330,7 +278,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
         		</li>
       		
 		</ul>
@@ -386,7 +334,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/docker-pipework/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/elasticsearch-slowlog/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -401,18 +349,18 @@
 
 <nav id="article-nav">
   
-    <a href="/2023/09/28/elasticsearch-introduce/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2023/09/28/elasticsearch-optimize/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          elasticsearch相关介绍
+          elasticsearch基础优化
         
       </div>
     </a>
   
   
-    <a href="/2023/09/28/docker-net/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">docker容器—网络模式</div>
+    <a href="/2023/09/28/elasticsearch-manage/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">elasticsearch常用管理与操作</div>
       <i class="icon-circle-right"></i>
     </a>
   

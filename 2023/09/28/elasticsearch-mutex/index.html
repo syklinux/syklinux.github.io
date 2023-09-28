@@ -6,25 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://syklinux.github.io">
-  <title>docker容器—PIPEWORK解读与实践 | Syklinux的博客</title>
+  <title>elasticsearch并发冲突、悲观锁与乐观锁 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+  <meta name="description" content="例子多线程程序，比如两个人来查询，一共有 100 个商品，两个人都取出来一个，两个线程都会处理为 100-1&#x3D;99，并送回到 es 里，总有线程会先到，这里处理就有报错了 es 处理悲观锁和乐观锁 悲观锁并发控制方案 常见于关系型数据库（一个线程来读取数据，并同时对这一行数据加锁；另一个线程来读取数据，是读不到这个数据的，当第一个线程处理完学回去后，第二个线程就可以读取到新的数据了）">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker容器—PIPEWORK解读与实践">
-<meta property="og:url" content="https://syklinux.github.io/2023/09/28/docker-pipework/index.html">
+<meta property="og:title" content="elasticsearch并发冲突、悲观锁与乐观锁">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/28/elasticsearch-mutex/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
-<meta property="og:description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+<meta property="og:description" content="例子多线程程序，比如两个人来查询，一共有 100 个商品，两个人都取出来一个，两个线程都会处理为 100-1&#x3D;99，并送回到 es 里，总有线程会先到，这里处理就有报错了 es 处理悲观锁和乐观锁 悲观锁并发控制方案 常见于关系型数据库（一个线程来读取数据，并同时对这一行数据加锁；另一个线程来读取数据，是读不到这个数据的，当第一个线程处理完学回去后，第二个线程就可以读取到新的数据了）">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
-<meta property="article:published_time" content="2023-09-28T02:15:04.000Z">
-<meta property="article:modified_time" content="2023-09-28T06:42:57.847Z">
+<meta property="article:published_time" content="2023-09-28T06:09:51.000Z">
+<meta property="article:modified_time" content="2023-09-28T06:44:06.453Z">
 <meta property="article:author" content="syklinux">
 <meta property="article:tag" content="运维">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="elasticsearch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
   
@@ -165,14 +163,14 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-docker-pipework" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-elasticsearch-mutex" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
   
   
     <h1 class="article-title" itemprop="name">
-      docker容器—PIPEWORK解读与实践
+      elasticsearch并发冲突、悲观锁与乐观锁
     </h1>
   
 
@@ -184,8 +182,8 @@
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/2023/09/28/docker-pipework/" class="archive-article-date">
-        <time datetime="2023-09-28T02:15:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+<a href="/2023/09/28/elasticsearch-mutex/" class="archive-article-date">
+        <time datetime="2023-09-28T06:09:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
 </a>
 
   
@@ -198,7 +196,7 @@
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">1.3k字</span>
+      <span class="post-count">350字</span>
     </span>
   </span>
 
@@ -207,7 +205,7 @@
     <span class="post-meta-item-icon">
       <i class="icon-book icon"></i>
       <span class="post-meta-item-text"> 阅读时长≈</span>
-      <span class="post-count">5分</span>
+      <span class="post-count">1分</span>
     </span>
   </span>
 </div>
@@ -218,78 +216,25 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <blockquote>
-<p>本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。</p>
-</blockquote>
-<ul>
-<li>1、pipework 的使用以及源码分析<br>Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改善 Docker 的网络功能，如 pipework、weave、flannel 等。这里，就先介绍一下 pipework 的使用和工作原理。<br>pipework 是由 Docker 的工程师 JérmePetazzoni 开发的一个 Docker 网络配置工具，由 200 多行 shell 实现，方便易用。下面用三个场景来演示 pipework 的使用和工作原理。</li>
+    <h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>多线程程序，比如两个人来查询，一共有 100 个商品，两个人都取出来一个，两个线程都会处理为 100-1&#x3D;99，并送回到 es 里，总有线程会先到，这里处理就有报错了</p>
+<h2 id="es-处理"><a href="#es-处理" class="headerlink" title="es 处理"></a>es 处理</h2><h4 id="悲观锁和乐观锁"><a href="#悲观锁和乐观锁" class="headerlink" title="悲观锁和乐观锁"></a>悲观锁和乐观锁</h4><ul>
+<li><p>悲观锁并发控制方案</p>
+<p>常见于关系型数据库（一个线程来读取数据，并同时对这一行数据加锁；另一个线程来读取数据，是读不到这个数据的，当第一个线程处理完学回去后，第二个线程就可以读取到新的数据了）</p>
+</li>
+<li><p>乐观锁并发控制方案</p>
+<p>es 使用的是乐观锁（第一个线程来获取数据，处理之后将数据写回 es，会检查 version 的版本是否一致，并将 version 变为 2，另一个线程同时来读取数据，处理之后写回 es，判断 version 是否相同，不同则会重新获取数据，并处理数据。）</p>
+</li>
 </ul>
 <span id="more"></span>
 
-<ul>
-<li>1.1、将 Docker 容器配置到本地网络环境中</li>
-</ul>
-<p>为了使本地网络中的机器和 Docker 容器更方便的通信，我们经常会有将 Docker 容器配置到和主机同一网段的需求。这个需求其实很容易实现，我们只要将 Docker 容器和主机的网卡桥接起来，再给 Docker 容器配上 IP 就可以了。</p>
-<p>下面我们来操作一下，</p>
-<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主机 <span class="keyword">A</span> 地址为<span class="number">192.168.137.100</span>/<span class="number">24</span></span><br><span class="line">网关为 <span class="number">192.168.137.1</span></span><br><span class="line">需要给 Docker 容器的地址配置为 <span class="number">192.168.137.150</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
-
-<p>在主机 A 上做如下操作：</p>
-<h4 id="安装-pipework"><a href="#安装-pipework" class="headerlink" title="安装 pipework"></a>安装 pipework</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/jpetazzo/</span>pipework</span><br><span class="line">cp ~<span class="regexp">/pipework/</span>pipework <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span></span><br></pre></td></tr></table></figure>
-
-<p>启动 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>配置容器网络，并连到网桥 br0 上。网关在 IP 地址后面加@指定。若主机环境中存在 dhcp 服务器，也可以通过 dhcp 的方式获取 IP</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> br0 test1 dhcp</span><br><span class="line"><span class="attribute">pipework</span> br0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span>@<span class="number">192.168.137.1</span></span><br></pre></td></tr></table></figure>
-
-<p>将主机 eth0 桥接到 br0 上，并把 eth0 的 IP 配置在 br0 上。这里由于是远程操作，中间网络会断掉，所以放在一条命令中执行.</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> addr add <span class="number">192.168.137.100</span>/<span class="number">24</span> dev br0;</span><br><span class="line"><span class="attribute">ip</span> addr del <span class="number">192.168.137.100</span>/<span class="number">24</span> dev eth0;</span><br><span class="line"><span class="attribute">brctl</span> addif br0 eth0;</span><br><span class="line"><span class="attribute">ip</span> route del default;</span><br><span class="line"><span class="attribute">ip</span> route add default gw <span class="number">192.168.137.1</span> dev br0</span><br></pre></td></tr></table></figure>
-
-<p>这时可以 ifconfig 看一下：（截取不完，只截取需要的）</p>
-<p><img src="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg" alt="active"></p>
-<ul>
-<li><p>2.2、单主机 Docker 容器 VLAN 划分<br>pipework 不仅可以使用 Linux bridge 连接 Docker 容器，还可以与 OpenVswitch 结合，实现 Docker 容器的 VLAN 划分。为了演示隔离效果，我们将 4 个容器放在了同一个 IP 网段中。但实际他们是二层隔离的两个网络，有不同的广播域。</p>
-<p>在主机 A 上创建 4 个 Docker 容器，test1、test2、test3、test4</p>
+<h4 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h4><ul>
+<li><p>优点：</p>
+<p>悲观锁：方便，直接加锁，对应用来说透明<br>乐观锁：并发能力高，不给数据加锁，大量并发操作</p>
+</li>
+<li><p>缺点：</p>
+<p>悲观锁：同一时间只能一个线程处理数据<br>乐观锁：麻烦，每次更新，都要先对比 version，然后可能要重新加载数据，可能会重复很多次</p>
 </li>
 </ul>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test3 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test4 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test1，test2 划分到一个 vlan 中，vlan 在 mac 地址后加@指定，此处 mac 地址省略。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">100</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test3，test4 划分到另一个 vlan 中</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">200</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>完成上述操作后，使用 docker attach 连到容器中，然后用 ping 命令测试连通性，发现 test1 和 test2 可以相互通信，但与 test3 和 test4 隔离。这样，一个简单的 VLAN 隔离容器网络就已经完成。</p>
-<ul>
-<li>2.3、多主机 Docker 容器的 VLAN 划分</li>
-</ul>
-<p>为了实现这个目的，我们把宿主机上的网卡桥接到各自的 OVS 网桥上，然后再为容器配置 IP 和 VLAN 就可以了。<br>我们实验环境如下:</p>
-<blockquote>
-<p>主机 A 和 B 各有一块网卡 eth0，IP 地址分别为 192.168.137.100&#x2F;24，192.168.137.101&#x2F;24。<br>在主机 A 上创建两个容器 test1、test2，分别在 VLAN 100 和 VLAN 200 上。<br>在主机 B 上创建 test3、test4，分别在 VLAN 100 和 VLAN 200 上。<br>最终，test1 可以和 test3 通信，test2 可以和 test4 通信。</p>
-</blockquote>
-<h5 id="在主机-A-上"><a href="#在主机-A-上" class="headerlink" title="在主机 A 上"></a>在主机 A 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>划分 VLAN</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.100/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.100/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1dev ovs0</span><br></pre></td></tr></table></figure>
-
-<h5 id="在主机-B-上"><a href="#在主机-B-上" class="headerlink" title="在主机 B 上"></a>在主机 B 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> run -itd --name test3 centos /bin/bash</span><br><span class="line"><span class="attribute">docker</span> run -itd --name test4 centos /bin/bash</span><br><span class="line"><span class="comment">#划分VLAN</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.101/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.101/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1 dev ovs0</span><br></pre></td></tr></table></figure>
-
-<p>完成上面的步骤后</p>
-<blockquote>
-<p>主机 A 上的 test1 和主机 B 上的 test3 容器就划分到了一个 VLAN 中，<br>并且与主机 A 上的 test2 和主机 B 上的 test4 隔离（主机 eth0 网卡需要设置为混杂模式，连接主机的交换机端口应设置为 trunk 模式，即允许 VLAN 100 和 VLAN 200 的包通过）。</p>
-</blockquote>
-<blockquote>
-<p>除此之外，pipework 还支持使用 macvlan 设备、设置网卡 MAC 地址等功能。不过，pipework 有一个缺陷，就是配置的容器在关掉重启后，之前的设置会丢失。</p>
-</blockquote>
 
     
 
@@ -304,7 +249,7 @@
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="https://syklinux.github.io/2023/09/28/docker-pipework/" title="docker容器—PIPEWORK解读与实践" target="_blank">https://syklinux.github.io/2023/09/28/docker-pipework/</a>
+          <a href="https://syklinux.github.io/2023/09/28/elasticsearch-mutex/" title="elasticsearch并发冲突、悲观锁与乐观锁" target="_blank">https://syklinux.github.io/2023/09/28/elasticsearch-mutex/</a>
         </li>
         
         <li>
@@ -330,7 +275,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
         		</li>
       		
 		</ul>
@@ -386,7 +331,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/docker-pipework/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/elasticsearch-mutex/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -401,18 +346,18 @@
 
 <nav id="article-nav">
   
-    <a href="/2023/09/28/elasticsearch-introduce/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2023/09/28/elasticsearch-update/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          elasticsearch相关介绍
+          elasticsearch版本升级策略
         
       </div>
     </a>
   
   
-    <a href="/2023/09/28/docker-net/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">docker容器—网络模式</div>
+    <a href="/2023/09/28/elasticsearch-schema/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">elasticsearch基础分布式架构</div>
       <i class="icon-circle-right"></i>
     </a>
   

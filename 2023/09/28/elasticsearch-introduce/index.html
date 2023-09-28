@@ -6,25 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://syklinux.github.io">
-  <title>docker容器—PIPEWORK解读与实践 | Syklinux的博客</title>
+  <title>elasticsearch相关介绍 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+  <meta name="description" content="1、lucene： 封装了搜索引擎的功能 只能在单台服务器上使用，最多处理单台服务器能处理的数据  2、es 的功能 1、分布式的搜索引擎和数据分析引擎 2、全文搜索，结构化检索，数据分析，部分匹配，自动完成，搜索纠错 3、对海量数据进行近实时的处理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker容器—PIPEWORK解读与实践">
-<meta property="og:url" content="https://syklinux.github.io/2023/09/28/docker-pipework/index.html">
+<meta property="og:title" content="elasticsearch相关介绍">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/28/elasticsearch-introduce/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
-<meta property="og:description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+<meta property="og:description" content="1、lucene： 封装了搜索引擎的功能 只能在单台服务器上使用，最多处理单台服务器能处理的数据  2、es 的功能 1、分布式的搜索引擎和数据分析引擎 2、全文搜索，结构化检索，数据分析，部分匹配，自动完成，搜索纠错 3、对海量数据进行近实时的处理">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
-<meta property="article:published_time" content="2023-09-28T02:15:04.000Z">
-<meta property="article:modified_time" content="2023-09-28T06:42:57.847Z">
+<meta property="article:published_time" content="2023-09-28T06:04:00.000Z">
+<meta property="article:modified_time" content="2023-09-28T06:43:48.849Z">
 <meta property="article:author" content="syklinux">
 <meta property="article:tag" content="运维">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="elasticsearch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
   
@@ -165,14 +163,14 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-docker-pipework" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-elasticsearch-introduce" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
   
   
     <h1 class="article-title" itemprop="name">
-      docker容器—PIPEWORK解读与实践
+      elasticsearch相关介绍
     </h1>
   
 
@@ -184,8 +182,8 @@
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/2023/09/28/docker-pipework/" class="archive-article-date">
-        <time datetime="2023-09-28T02:15:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+<a href="/2023/09/28/elasticsearch-introduce/" class="archive-article-date">
+        <time datetime="2023-09-28T06:04:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
 </a>
 
   
@@ -198,7 +196,7 @@
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">1.3k字</span>
+      <span class="post-count">890字</span>
     </span>
   </span>
 
@@ -207,7 +205,7 @@
     <span class="post-meta-item-icon">
       <i class="icon-book icon"></i>
       <span class="post-meta-item-text"> 阅读时长≈</span>
-      <span class="post-count">5分</span>
+      <span class="post-count">3分</span>
     </span>
   </span>
 </div>
@@ -218,78 +216,61 @@
   
   <div class="article-entry" itemprop="articleBody">
     
-    <blockquote>
-<p>本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。</p>
-</blockquote>
-<ul>
-<li>1、pipework 的使用以及源码分析<br>Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改善 Docker 的网络功能，如 pipework、weave、flannel 等。这里，就先介绍一下 pipework 的使用和工作原理。<br>pipework 是由 Docker 的工程师 JérmePetazzoni 开发的一个 Docker 网络配置工具，由 200 多行 shell 实现，方便易用。下面用三个场景来演示 pipework 的使用和工作原理。</li>
+    <h2 id="1、lucene："><a href="#1、lucene：" class="headerlink" title="1、lucene："></a>1、lucene：</h2><ul>
+<li>封装了搜索引擎的功能</li>
+<li>只能在单台服务器上使用，最多处理单台服务器能处理的数据</li>
+</ul>
+<h2 id="2、es-的功能"><a href="#2、es-的功能" class="headerlink" title="2、es 的功能"></a>2、es 的功能</h2><ul>
+<li>1、分布式的搜索引擎和数据分析引擎</li>
+<li>2、全文搜索，结构化检索，数据分析，部分匹配，自动完成，搜索纠错</li>
+<li>3、对海量数据进行近实时的处理</li>
 </ul>
 <span id="more"></span>
 
-<ul>
-<li>1.1、将 Docker 容器配置到本地网络环境中</li>
+<p>近实时：检索数据要花费 1 小时（这就不要近实时，离线批处理，batch-processing）；在秒级对数据进行搜索和分析</p>
+<h2 id="3、es-的适用场景"><a href="#3、es-的适用场景" class="headerlink" title="3、es 的适用场景"></a>3、es 的适用场景</h2><ul>
+<li>1、日志搜索和分析（elk）</li>
+<li>2、GITHUB</li>
+<li>3、站内搜索</li>
 </ul>
-<p>为了使本地网络中的机器和 Docker 容器更方便的通信，我们经常会有将 Docker 容器配置到和主机同一网段的需求。这个需求其实很容易实现，我们只要将 Docker 容器和主机的网卡桥接起来，再给 Docker 容器配上 IP 就可以了。</p>
-<p>下面我们来操作一下，</p>
-<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主机 <span class="keyword">A</span> 地址为<span class="number">192.168.137.100</span>/<span class="number">24</span></span><br><span class="line">网关为 <span class="number">192.168.137.1</span></span><br><span class="line">需要给 Docker 容器的地址配置为 <span class="number">192.168.137.150</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
-
-<p>在主机 A 上做如下操作：</p>
-<h4 id="安装-pipework"><a href="#安装-pipework" class="headerlink" title="安装 pipework"></a>安装 pipework</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/jpetazzo/</span>pipework</span><br><span class="line">cp ~<span class="regexp">/pipework/</span>pipework <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span></span><br></pre></td></tr></table></figure>
-
-<p>启动 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>配置容器网络，并连到网桥 br0 上。网关在 IP 地址后面加@指定。若主机环境中存在 dhcp 服务器，也可以通过 dhcp 的方式获取 IP</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> br0 test1 dhcp</span><br><span class="line"><span class="attribute">pipework</span> br0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span>@<span class="number">192.168.137.1</span></span><br></pre></td></tr></table></figure>
-
-<p>将主机 eth0 桥接到 br0 上，并把 eth0 的 IP 配置在 br0 上。这里由于是远程操作，中间网络会断掉，所以放在一条命令中执行.</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> addr add <span class="number">192.168.137.100</span>/<span class="number">24</span> dev br0;</span><br><span class="line"><span class="attribute">ip</span> addr del <span class="number">192.168.137.100</span>/<span class="number">24</span> dev eth0;</span><br><span class="line"><span class="attribute">brctl</span> addif br0 eth0;</span><br><span class="line"><span class="attribute">ip</span> route del default;</span><br><span class="line"><span class="attribute">ip</span> route add default gw <span class="number">192.168.137.1</span> dev br0</span><br></pre></td></tr></table></figure>
-
-<p>这时可以 ifconfig 看一下：（截取不完，只截取需要的）</p>
-<p><img src="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg" alt="active"></p>
-<ul>
-<li><p>2.2、单主机 Docker 容器 VLAN 划分<br>pipework 不仅可以使用 Linux bridge 连接 Docker 容器，还可以与 OpenVswitch 结合，实现 Docker 容器的 VLAN 划分。为了演示隔离效果，我们将 4 个容器放在了同一个 IP 网段中。但实际他们是二层隔离的两个网络，有不同的广播域。</p>
-<p>在主机 A 上创建 4 个 Docker 容器，test1、test2、test3、test4</p>
+<h2 id="4、es-的特点"><a href="#4、es-的特点" class="headerlink" title="4、es 的特点"></a>4、es 的特点</h2><ul>
+<li>1、可以作为一个大型分布式集群，处理 pb 级数据，服务大公司，也可以运行在单机上，服务小公司。</li>
+<li>2、开箱即用。</li>
+<li>3、作为传统数据库的一个补充，提供了数据库不能提供的一些功能</li>
+</ul>
+<h2 id="5、es-的核心概念"><a href="#5、es-的核心概念" class="headerlink" title="5、es 的核心概念"></a>5、es 的核心概念</h2><ul>
+<li><p>1、near realtime（NRT）</p>
+<p>近实时，从写入数据到数据可以从被搜索到有一个小延迟，基于 es 执行搜索和分析可以达到秒级</p>
+</li>
+<li><p>2、cluster 集群：</p>
+<p>包含多个节点，每个节点属于那个集群是通过一个配置来决定的，对于中小企业来说，刚开始集群就一两个节点</p>
+</li>
+<li><p>3、node 节点：</p>
+<p>集群中的一个节点，节点也有名称，节点名称很重要，默认节点会去加入配置文件里写明的集群名称的集群中。</p>
+</li>
+<li><p>4、document：</p>
+<p>文档，es 中的最小数据单元，一个 document 可以是一条客户数据，一条电商分类索引，通常用 json 数据结构表示，每个 index 下的 type 中，都可以存储多个 document。一个 document 里面有多个 field，每个 field 就是一个数据字段。</p>
+</li>
+<li><p>5、index：</p>
+<p>索引，包含一堆有相似结构的文档数据，一个 index 包含很多 document，一个 index 就代表了一类类似的或者相同的 document。</p>
+</li>
+<li><p>6、type：</p>
+<p>类型，每个索引了都可以有一个或很多的 type，type 是 index 的一个逻辑数据分类，一个 tyoe 下的 document 都有相同的 field。</p>
+</li>
+<li><p>7、shard：</p>
+<p>单台机器无法存储大量数据，es 可以将一个索引中的数据切分为多个 shard，分布在多台机器上存储。有了 shard 就可以横向扩展，存储更多数据，让搜索和分析操作分布到多台服务器上去吃行，提升吞吐量和性能，每个 shard 都是一个 lucene index。</p>
+</li>
+<li><p>8、replica：</p>
+<p>任何一个服务器随时可能故障或当机，此时 shard 可能就会丢失，因此可以为每一个 shard 创建多个 replica，当这个 shard 故障时，这个 shard 的其中一个 replica 会被立刻提升为 shard，并开始重新平衡，保证数据不会丢失。</p>
 </li>
 </ul>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test3 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test4 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test1，test2 划分到一个 vlan 中，vlan 在 mac 地址后加@指定，此处 mac 地址省略。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">100</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test3，test4 划分到另一个 vlan 中</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">200</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>完成上述操作后，使用 docker attach 连到容器中，然后用 ping 命令测试连通性，发现 test1 和 test2 可以相互通信，但与 test3 和 test4 隔离。这样，一个简单的 VLAN 隔离容器网络就已经完成。</p>
+<h2 id="6、document-数据格式"><a href="#6、document-数据格式" class="headerlink" title="6、document 数据格式"></a>6、document 数据格式</h2><p>面向文档的索引分析引擎</p>
 <ul>
-<li>2.3、多主机 Docker 容器的 VLAN 划分</li>
+<li>1、应用系统的数据结构都是面向对象的，复杂的</li>
+<li>2、对象数据存储到数据库中，只能拆解开来，变成扁平化的多张表，每次查询的时候还得还原回对象格式，相当麻烦</li>
+<li>3、es 是面向文档的，文档中存储的数据结构，与面向对象的数据结构是一样的，基于这种文档数据结构，es 可以提供负责的索引，全文检索，分析聚合等功能。</li>
+<li>4、es 的 docement 用 json 数据格式来表达.</li>
 </ul>
-<p>为了实现这个目的，我们把宿主机上的网卡桥接到各自的 OVS 网桥上，然后再为容器配置 IP 和 VLAN 就可以了。<br>我们实验环境如下:</p>
-<blockquote>
-<p>主机 A 和 B 各有一块网卡 eth0，IP 地址分别为 192.168.137.100&#x2F;24，192.168.137.101&#x2F;24。<br>在主机 A 上创建两个容器 test1、test2，分别在 VLAN 100 和 VLAN 200 上。<br>在主机 B 上创建 test3、test4，分别在 VLAN 100 和 VLAN 200 上。<br>最终，test1 可以和 test3 通信，test2 可以和 test4 通信。</p>
-</blockquote>
-<h5 id="在主机-A-上"><a href="#在主机-A-上" class="headerlink" title="在主机 A 上"></a>在主机 A 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>划分 VLAN</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.100/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.100/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1dev ovs0</span><br></pre></td></tr></table></figure>
-
-<h5 id="在主机-B-上"><a href="#在主机-B-上" class="headerlink" title="在主机 B 上"></a>在主机 B 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> run -itd --name test3 centos /bin/bash</span><br><span class="line"><span class="attribute">docker</span> run -itd --name test4 centos /bin/bash</span><br><span class="line"><span class="comment">#划分VLAN</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.101/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.101/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1 dev ovs0</span><br></pre></td></tr></table></figure>
-
-<p>完成上面的步骤后</p>
-<blockquote>
-<p>主机 A 上的 test1 和主机 B 上的 test3 容器就划分到了一个 VLAN 中，<br>并且与主机 A 上的 test2 和主机 B 上的 test4 隔离（主机 eth0 网卡需要设置为混杂模式，连接主机的交换机端口应设置为 trunk 模式，即允许 VLAN 100 和 VLAN 200 的包通过）。</p>
-</blockquote>
-<blockquote>
-<p>除此之外，pipework 还支持使用 macvlan 设备、设置网卡 MAC 地址等功能。不过，pipework 有一个缺陷，就是配置的容器在关掉重启后，之前的设置会丢失。</p>
-</blockquote>
 
     
 
@@ -304,7 +285,7 @@
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="https://syklinux.github.io/2023/09/28/docker-pipework/" title="docker容器—PIPEWORK解读与实践" target="_blank">https://syklinux.github.io/2023/09/28/docker-pipework/</a>
+          <a href="https://syklinux.github.io/2023/09/28/elasticsearch-introduce/" title="elasticsearch相关介绍" target="_blank">https://syklinux.github.io/2023/09/28/elasticsearch-introduce/</a>
         </li>
         
         <li>
@@ -330,7 +311,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
         		</li>
       		
 		</ul>
@@ -386,7 +367,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/docker-pipework/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/elasticsearch-introduce/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -401,18 +382,18 @@
 
 <nav id="article-nav">
   
-    <a href="/2023/09/28/elasticsearch-introduce/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2023/09/28/elasticsearch-schema/" id="article-nav-newer" class="article-nav-link-wrap">
       <i class="icon-circle-left"></i>
       <div class="article-nav-title">
         
-          elasticsearch相关介绍
+          elasticsearch基础分布式架构
         
       </div>
     </a>
   
   
-    <a href="/2023/09/28/docker-net/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">docker容器—网络模式</div>
+    <a href="/2023/09/28/docker-pipework/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">docker容器—PIPEWORK解读与实践</div>
       <i class="icon-circle-right"></i>
     </a>
   

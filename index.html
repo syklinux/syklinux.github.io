@@ -164,6 +164,689 @@
             
 
   
+    <article id="post-elasticsearch-optimize" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-optimize/" target="_blank">elasticsearch基础优化</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-optimize/" class="archive-article-date">
+        <time datetime="2023-09-28T06:35:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <blockquote>
+<p>最最基础，要成为大家脑海中，对 es 的性能优化的一种常识性的知识，以后做 es 的时候，就是要按照这个最基本的规范来做。</p>
+</blockquote>
+<h2 id="1、搜索结果不要返回过大的结果集"><a href="#1、搜索结果不要返回过大的结果集" class="headerlink" title="1、搜索结果不要返回过大的结果集"></a>1、搜索结果不要返回过大的结果集</h2><p>es 是一个搜索引擎，所以如果用这个搜索引擎对大量的数据进行搜索，并且返回搜索结果中排在最前面的少数结果，是非常合适的。然而，如果要做成类似数据库的东西，每次都进行大批量的查询，是很不合适的。如果真的要做大批量结果的查询，记得考虑用 scroll api。</p>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-optimize/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-optimize/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-elasticsearch-slowlog" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-slowlog/" target="_blank">elasticsearch开启慢查询日志</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-slowlog/" class="archive-article-date">
+        <time datetime="2023-09-28T06:19:20.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h2 id="es-查询一下需要-5s、10s-甚至更长？"><a href="#es-查询一下需要-5s、10s-甚至更长？" class="headerlink" title="es 查询一下需要 5s、10s 甚至更长？"></a>es 查询一下需要 5s、10s 甚至更长？</h2><p>es 里面的操作，主要分为两种，一种写入（增删改），另一种是查询（搜索）。<br>我们分别要识别出来，哪些写入操作性能比较慢，哪些查询操作性能比较慢，先要识别出来有性能问题的这些慢查询，慢写入，然后才能去考虑如何优化写入的性能，如何优化搜索的性能。</p>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-slowlog/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-slowlog/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-elasticsearch-manage" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-manage/" target="_blank">elasticsearch常用管理与操作</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-manage/" class="archive-article-date">
+        <time datetime="2023-09-28T06:15:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h3 id="索引管理"><a href="#索引管理" class="headerlink" title="索引管理"></a>索引管理</h3><ul>
+<li><p>1、创建索引</p>
+<p>用 setting 给这个索引在创建时添加一些设置，还可以初始化一些 type 的 mapping</p>
+</li>
+<li><p>2、打开&#x2F;关闭索引</p>
+</li>
+</ul>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST &#x27;http://elasticsearch02:<span class="number">9200</span>/twitter/_close?pretty&#x27;</span><br><span class="line">curl -XPOST &#x27;http://elasticsearch02:<span class="number">9200</span>/twitter/_open?pretty&#x27;</span><br></pre></td></tr></table></figure>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-manage/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-manage/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-elasticsearch-update" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-update/" target="_blank">elasticsearch版本升级策略</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-update/" class="archive-article-date">
+        <time datetime="2023-09-28T06:11:10.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h2 id="es-大版本之间的小版本升级"><a href="#es-大版本之间的小版本升级" class="headerlink" title="es 大版本之间的小版本升级"></a>es 大版本之间的小版本升级</h2><h4 id="滚动升级"><a href="#滚动升级" class="headerlink" title="滚动升级"></a>滚动升级</h4><ul>
+<li>1、禁止分片自动平衡</li>
+<li>2、停止集群读写操作，并执行一次 flush 操作</li>
+<li>3、停止这个节点，然后升级</li>
+</ul>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-update/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-update/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-elasticsearch-mutex" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-mutex/" target="_blank">elasticsearch并发冲突、悲观锁与乐观锁</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-mutex/" class="archive-article-date">
+        <time datetime="2023-09-28T06:09:51.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>多线程程序，比如两个人来查询，一共有 100 个商品，两个人都取出来一个，两个线程都会处理为 100-1&#x3D;99，并送回到 es 里，总有线程会先到，这里处理就有报错了</p>
+<h2 id="es-处理"><a href="#es-处理" class="headerlink" title="es 处理"></a>es 处理</h2><h4 id="悲观锁和乐观锁"><a href="#悲观锁和乐观锁" class="headerlink" title="悲观锁和乐观锁"></a>悲观锁和乐观锁</h4><ul>
+<li><p>悲观锁并发控制方案</p>
+<p>常见于关系型数据库（一个线程来读取数据，并同时对这一行数据加锁；另一个线程来读取数据，是读不到这个数据的，当第一个线程处理完学回去后，第二个线程就可以读取到新的数据了）</p>
+</li>
+<li><p>乐观锁并发控制方案</p>
+<p>es 使用的是乐观锁（第一个线程来获取数据，处理之后将数据写回 es，会检查 version 的版本是否一致，并将 version 变为 2，另一个线程同时来读取数据，处理之后写回 es，判断 version 是否相同，不同则会重新获取数据，并处理数据。）</p>
+</li>
+</ul>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-mutex/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-mutex/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-elasticsearch-schema" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-schema/" target="_blank">elasticsearch基础分布式架构</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-schema/" class="archive-article-date">
+        <time datetime="2023-09-28T06:07:49.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h2 id="1、es-对复杂分布式机制的透明隐藏特性"><a href="#1、es-对复杂分布式机制的透明隐藏特性" class="headerlink" title="1、es 对复杂分布式机制的透明隐藏特性"></a>1、es 对复杂分布式机制的透明隐藏特性</h2><p>es 是一套分布式系统，分布式是为了应对大数据<br>隐藏特性：</p>
+<ul>
+<li>分片</li>
+<li>cluster discovery</li>
+<li>shard 负载均衡</li>
+<li>shard 副本</li>
+<li>请求路由</li>
+<li>集群扩容</li>
+<li>shard 重新分配</li>
+</ul>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-schema/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-schema/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-elasticsearch-introduce" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+  
+  
+    <h1 itemprop="name">
+	
+	  <a class="article-title" href="/2023/09/28/elasticsearch-introduce/" target="_blank">elasticsearch相关介绍</a>
+  
+    </h1>
+  
+
+
+  
+  
+<a href="/2023/09/28/elasticsearch-introduce/" class="archive-article-date">
+        <time datetime="2023-09-28T06:04:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+</a>
+
+  
+  
+    
+
+  
+  </header>
+  
+  <div class="article-entry" itemprop="articleBody">
+    
+    <h2 id="1、lucene："><a href="#1、lucene：" class="headerlink" title="1、lucene："></a>1、lucene：</h2><ul>
+<li>封装了搜索引擎的功能</li>
+<li>只能在单台服务器上使用，最多处理单台服务器能处理的数据</li>
+</ul>
+<h2 id="2、es-的功能"><a href="#2、es-的功能" class="headerlink" title="2、es 的功能"></a>2、es 的功能</h2><ul>
+<li>1、分布式的搜索引擎和数据分析引擎</li>
+<li>2、全文搜索，结构化检索，数据分析，部分匹配，自动完成，搜索纠错</li>
+<li>3、对海量数据进行近实时的处理</li>
+</ul>
+    
+    <a class="article-more-a" href="/2023/09/28/elasticsearch-introduce/#more">more >></a>
+    
+    
+
+    
+
+    
+
+  </div>
+  <div class="article-info article-info-index">
+    
+    
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+    
+
+    
+    <p class="article-more-link">
+      <a class="article-more-a" href="/2023/09/28/elasticsearch-introduce/">展开全文 >></a>
+    </p>
+    
+
+    
+    <div class="clearfix"></div>
+  </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-docker-pipework" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -454,200 +1137,10 @@
 
 
   
-    <article id="post-ceph-init" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
   
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2023/09/27/ceph-init/" target="_blank">ceph 单机部署</a>
-  
-    </h1>
-  
-
-
-  
-  
-<a href="/2023/09/27/ceph-init/" class="archive-article-date">
-        <time datetime="2023-09-27T08:56:08.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-27</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <h4 id="一、环境"><a href="#一、环境" class="headerlink" title="一、环境"></a>一、环境</h4><blockquote>
-<p>只使用了一台机器，</p>
-</blockquote>
-<pre><code>centos7.2；
-ceph==0.94.10；
-6块4T的SAS硬盘，分别做了三个raid1.
-</code></pre>
-    
-    <a class="article-more-a" href="/2023/09/27/ceph-init/#more">more >></a>
-    
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">ceph</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2023/09/27/ceph-init/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-svn" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-  
-  
-    <h1 itemprop="name">
-	
-	  <a class="article-title" href="/2023/09/27/svn/" target="_blank">svn 钩子</a>
-  
-    </h1>
-  
-
-
-  
-  
-<a href="/2023/09/27/svn/" class="archive-article-date">
-        <time datetime="2023-09-27T07:57:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-27</time>
-</a>
-
-  
-  
-    
-
-  
-  </header>
-  
-  <div class="article-entry" itemprop="articleBody">
-    
-    <blockquote>
-<p>钩子脚本就是 shell 的写法，钩子就是被某些版本库事件触发的程序。</p>
-</blockquote>
-<h1 id="一、svn-钩子"><a href="#一、svn-钩子" class="headerlink" title="一、svn 钩子"></a>一、svn 钩子</h1><pre><code>钩子脚本就是shell的写法，钩子就是被某些版本库事件触发的程序。
-</code></pre>
-<h4 id="常用钩子："><a href="#常用钩子：" class="headerlink" title="常用钩子："></a>常用钩子：</h4><ul>
-<li>post-commit<br>在提交完成成功创建之后执行该钩子。（提交已经完成，不可更改) 更新之后，通过邮件、微信通知、更新触发 checkout 程序、然后推送到服务器</li>
-<li>pre-commit<br>提交完成前触发执行该脚本。限制上传文件的大小和拓展名，控制提交要输入的信息</li>
-</ul>
-    
-    <a class="article-more-a" href="/2023/09/27/svn/#more">more >></a>
-    
-    
-
-    
-
-    
-
-  </div>
-  <div class="article-info article-info-index">
-    
-    
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">运维</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-    
-
-    
-    <p class="article-more-link">
-      <a class="article-more-a" href="/2023/09/27/svn/">展开全文 >></a>
-    </p>
-    
-
-    
-    <div class="clearfix"></div>
-  </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &amp;raquo;</a>
+    </nav>
   
 
 
@@ -778,6 +1271,10 @@ ceph==0.94.10；
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">docker</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">elasticsearch</a>
               </li>
             
             <div class="clearfix"></div>

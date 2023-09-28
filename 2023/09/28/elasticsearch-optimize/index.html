@@ -6,25 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="https://syklinux.github.io">
-  <title>docker容器—PIPEWORK解读与实践 | Syklinux的博客</title>
+  <title>elasticsearch基础优化 | Syklinux的博客</title>
   <meta name="generator" content="hexo-theme-yilia-plus">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
-  <meta name="description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+  <meta name="description" content="最最基础，要成为大家脑海中，对 es 的性能优化的一种常识性的知识，以后做 es 的时候，就是要按照这个最基本的规范来做。  1、搜索结果不要返回过大的结果集es 是一个搜索引擎，所以如果用这个搜索引擎对大量的数据进行搜索，并且返回搜索结果中排在最前面的少数结果，是非常合适的。然而，如果要做成类似数据库的东西，每次都进行大批量的查询，是很不合适的。如果真的要做大批量结果的查询，记得考虑用 scr">
 <meta property="og:type" content="article">
-<meta property="og:title" content="docker容器—PIPEWORK解读与实践">
-<meta property="og:url" content="https://syklinux.github.io/2023/09/28/docker-pipework/index.html">
+<meta property="og:title" content="elasticsearch基础优化">
+<meta property="og:url" content="https://syklinux.github.io/2023/09/28/elasticsearch-optimize/index.html">
 <meta property="og:site_name" content="Syklinux的博客">
-<meta property="og:description" content="本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。   1、pipework 的使用以及源码分析Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改">
+<meta property="og:description" content="最最基础，要成为大家脑海中，对 es 的性能优化的一种常识性的知识，以后做 es 的时候，就是要按照这个最基本的规范来做。  1、搜索结果不要返回过大的结果集es 是一个搜索引擎，所以如果用这个搜索引擎对大量的数据进行搜索，并且返回搜索结果中排在最前面的少数结果，是非常合适的。然而，如果要做成类似数据库的东西，每次都进行大批量的查询，是很不合适的。如果真的要做大批量结果的查询，记得考虑用 scr">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
-<meta property="article:published_time" content="2023-09-28T02:15:04.000Z">
-<meta property="article:modified_time" content="2023-09-28T06:42:57.847Z">
+<meta property="article:published_time" content="2023-09-28T06:35:52.000Z">
+<meta property="article:modified_time" content="2023-09-28T06:45:52.647Z">
 <meta property="article:author" content="syklinux">
 <meta property="article:tag" content="运维">
-<meta property="article:tag" content="docker">
+<meta property="article:tag" content="elasticsearch">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg">
   
     <link rel="alternative" href="/atom.xml" title="Syklinux的博客" type="application/atom+xml">
   
@@ -165,14 +163,14 @@
               class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="post-docker-pipework" class="article article-type-post " itemscope itemprop="blogPost">
+            <article id="post-elasticsearch-optimize" class="article article-type-post " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
   
   
     <h1 class="article-title" itemprop="name">
-      docker容器—PIPEWORK解读与实践
+      elasticsearch基础优化
     </h1>
   
 
@@ -184,8 +182,8 @@
               <i class="icon-smile icon"></i> 阅读数：<span id="busuanzi_value_page_pv"></span>次
         </span>
 
-<a href="/2023/09/28/docker-pipework/" class="archive-article-date">
-        <time datetime="2023-09-28T02:15:04.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
+<a href="/2023/09/28/elasticsearch-optimize/" class="archive-article-date">
+        <time datetime="2023-09-28T06:35:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2023-09-28</time>
 </a>
 
   
@@ -198,7 +196,7 @@
       <!-- 百度字体平台:http://fontstore.baidu.com/static/editor/index.html -->
       <i class="icon-statistics"></i>
       <span class="post-meta-item-text"> 字数统计:</span>
-      <span class="post-count">1.3k字</span>
+      <span class="post-count">2.9k字</span>
     </span>
   </span>
 
@@ -207,7 +205,7 @@
     <span class="post-meta-item-icon">
       <i class="icon-book icon"></i>
       <span class="post-meta-item-text"> 阅读时长≈</span>
-      <span class="post-count">5分</span>
+      <span class="post-count">10分</span>
     </span>
   </span>
 </div>
@@ -219,77 +217,181 @@
   <div class="article-entry" itemprop="articleBody">
     
     <blockquote>
-<p>本文通过 3 个样例——将 Docker 容器配置到本地网络环境中、单主机 Docker 容器的 VLAN 划分、多主机 Docker 容器的 VLAN 划分，演示了如何使用 pipework 帮助我们进行复杂的网络设置，以及 pipework 是如何工作的。</p>
+<p>最最基础，要成为大家脑海中，对 es 的性能优化的一种常识性的知识，以后做 es 的时候，就是要按照这个最基本的规范来做。</p>
 </blockquote>
-<ul>
-<li>1、pipework 的使用以及源码分析<br>Docker 自身的网络功能比较简单，不能满足很多复杂的应用场景。因此，有很多开源项目用来改善 Docker 的网络功能，如 pipework、weave、flannel 等。这里，就先介绍一下 pipework 的使用和工作原理。<br>pipework 是由 Docker 的工程师 JérmePetazzoni 开发的一个 Docker 网络配置工具，由 200 多行 shell 实现，方便易用。下面用三个场景来演示 pipework 的使用和工作原理。</li>
-</ul>
+<h2 id="1、搜索结果不要返回过大的结果集"><a href="#1、搜索结果不要返回过大的结果集" class="headerlink" title="1、搜索结果不要返回过大的结果集"></a>1、搜索结果不要返回过大的结果集</h2><p>es 是一个搜索引擎，所以如果用这个搜索引擎对大量的数据进行搜索，并且返回搜索结果中排在最前面的少数结果，是非常合适的。然而，如果要做成类似数据库的东西，每次都进行大批量的查询，是很不合适的。如果真的要做大批量结果的查询，记得考虑用 scroll api。</p>
 <span id="more"></span>
 
-<ul>
-<li>1.1、将 Docker 容器配置到本地网络环境中</li>
-</ul>
-<p>为了使本地网络中的机器和 Docker 容器更方便的通信，我们经常会有将 Docker 容器配置到和主机同一网段的需求。这个需求其实很容易实现，我们只要将 Docker 容器和主机的网卡桥接起来，再给 Docker 容器配上 IP 就可以了。</p>
-<p>下面我们来操作一下，</p>
-<figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">主机 <span class="keyword">A</span> 地址为<span class="number">192.168.137.100</span>/<span class="number">24</span></span><br><span class="line">网关为 <span class="number">192.168.137.1</span></span><br><span class="line">需要给 Docker 容器的地址配置为 <span class="number">192.168.137.150</span>/<span class="number">24</span></span><br></pre></td></tr></table></figure>
-
-<p>在主机 A 上做如下操作：</p>
-<h4 id="安装-pipework"><a href="#安装-pipework" class="headerlink" title="安装 pipework"></a>安装 pipework</h4><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git clone https:<span class="regexp">//gi</span>thub.com<span class="regexp">/jpetazzo/</span>pipework</span><br><span class="line">cp ~<span class="regexp">/pipework/</span>pipework <span class="regexp">/usr/</span>local<span class="regexp">/bin/</span></span><br></pre></td></tr></table></figure>
-
-<p>启动 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>配置容器网络，并连到网桥 br0 上。网关在 IP 地址后面加@指定。若主机环境中存在 dhcp 服务器，也可以通过 dhcp 的方式获取 IP</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> br0 test1 dhcp</span><br><span class="line"><span class="attribute">pipework</span> br0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span>@<span class="number">192.168.137.1</span></span><br></pre></td></tr></table></figure>
-
-<p>将主机 eth0 桥接到 br0 上，并把 eth0 的 IP 配置在 br0 上。这里由于是远程操作，中间网络会断掉，所以放在一条命令中执行.</p>
-<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">ip</span> addr add <span class="number">192.168.137.100</span>/<span class="number">24</span> dev br0;</span><br><span class="line"><span class="attribute">ip</span> addr del <span class="number">192.168.137.100</span>/<span class="number">24</span> dev eth0;</span><br><span class="line"><span class="attribute">brctl</span> addif br0 eth0;</span><br><span class="line"><span class="attribute">ip</span> route del default;</span><br><span class="line"><span class="attribute">ip</span> route add default gw <span class="number">192.168.137.1</span> dev br0</span><br></pre></td></tr></table></figure>
-
-<p>这时可以 ifconfig 看一下：（截取不完，只截取需要的）</p>
-<p><img src="http://s2.51cto.com/wyfs02/M00/8A/96/wKioL1g09yPQ2XpJAAClIv0pny8527.jpg" alt="active"></p>
-<ul>
-<li><p>2.2、单主机 Docker 容器 VLAN 划分<br>pipework 不仅可以使用 Linux bridge 连接 Docker 容器，还可以与 OpenVswitch 结合，实现 Docker 容器的 VLAN 划分。为了演示隔离效果，我们将 4 个容器放在了同一个 IP 网段中。但实际他们是二层隔离的两个网络，有不同的广播域。</p>
-<p>在主机 A 上创建 4 个 Docker 容器，test1、test2、test3、test4</p>
+<h2 id="2、避免超大的-document"><a href="#2、避免超大的-document" class="headerlink" title="2、避免超大的 document"></a>2、避免超大的 document</h2><p>http.max_context_length 的默认值是 100mb，意味着你一次 document 写入时，document 的内容不能超过 100mb，否则 es 就会拒绝写入。也许你可以将这个参数设置的更大，从而让你的超大的 documdent 可以写入 es，但是 es 底层的 lucene 引擎还是有一个 2gb 的最大限制。</p>
+<p>即使我们不考虑引擎层的限制，超大的 document 在实际生产环境中是很不好的。<br>超大 document 会耗费更多的网络资源，内存资源和磁盘资源，甚至对那些不要求获取_source 的请求，也是一样，因为 es 需要从_source 中提取_id 字段，对于超大 document 这个获取 _id 字段的过程的资源开销也是很大的。而将这种超大 document 写入 es 也会使用大量的内存，占用内存空间的大小甚至会是 documdent 本身大小的数倍。近似匹配的搜索，比如 phrase query，以及高亮显示，对超大 document 的资源开销会更大，因为这些操作的性能开销直接跟 document 的大小成正比。</p>
+<p>因此对于超大 document，我们需要考虑一下，我们到底需要其中的哪些部分。</p>
+<p>举例来说，如果我们要对一些书进行搜索，那么我们并不需要将整本书的内容就放入 es 中吧。我们可以仅仅使用每一篇章或者一个段落作为一个 document，然后给一个 field 标识出来这些 document 属于哪本书，这样每个 document 的大小不就变小了么。这就可以避免超大 document 导致的各种开销，同时可以优化搜索的体验。</p>
+<p>比如说，如果一个用户要搜索两个单词，foo 和 bar，如果在两个不同的段落中分别匹配了一个单词，肯定匹配效果要比，一个段落中匹配了两个单词，要差。</p>
+<h2 id="3、避免稀疏的数据"><a href="#3、避免稀疏的数据" class="headerlink" title="3、避免稀疏的数据"></a>3、避免稀疏的数据</h2><p>lucene 的内核结构，跟稠密的数据配合起来，性能会更好。</p>
+<p>举个例子，什么叫稀疏的数据，什么叫稠密的数据？</p>
+<p>比如有 100 个 document，每个 document 都有 20 个 field，20 个 field 都有值，这就是稠密的数据。但是如果 100 个 document，每个 document 的 field 都不一样，有的 document 有 2 个 field，有的 document 有 50 个 field，这就是稀疏的数据。</p>
+<p>原因就是，lucene 在内部会通过 doc id 来唯一标识一个 document，这个 doc id 是 integer 类型，范围在 0 到索引中含有的 document 数量之间。这些 doc id 是用来在 lucene 内部的 api 之间进行通信的，比如说，对一个 term 用一个 match query 来进行搜索，就会产生一个 doc id 集合，然后这些 doc id 会用来获取对应的 norm 值，以用来计算每个 doc 的相关度分数。而根据 doc id 查找 norm 的过程，是通过每个 document 的每个 field 保留一个字节来进行的一个算法，这个过程叫做 norm 查找，norm 就是每个 document 的每个 field 保留的一个字节。对于每个 doc id 对应的那个 norm 值，可以通过读取 es 一个内置索引，叫做 doc_id 的索引，中的一个字节来获取。这个过程是性能很高的，而且可以帮助 lucene 快速的定位到每个 document 的 norm 值，但是同时这样的话 document 本身就不需要存储这一个字节的 norm 值了。</p>
+<p>在实际运行过程中，这就意味着，如果一个索引有 100 个 document，对于每个 field，就需要 100 个字节来存储 norm 值，即使 100 个 document 中只有 10 个 document 含有某个 field，但是对那个 field 来说，还是要 100 个字节来存储 norm 值。这就会对存储产生更大的开销，存储空间被浪费的一个问题，而且也会影响读写性能。</p>
+<h2 id="下面有一些避免稀疏数据的办法："><a href="#下面有一些避免稀疏数据的办法：" class="headerlink" title="下面有一些避免稀疏数据的办法："></a>下面有一些避免稀疏数据的办法：</h2><ul>
+<li><p>避免将没有任何关联性的数据写入同一个索引我们必须避免将结构完全不一样的数据写入同一个索引中，因为结构完全不一样的数据，field 是完全不一样的，会导致 index 数据非常稀疏。最好将这种数据写入不同的索引中，如果这种索引数据量比较少，那么可以考虑给其很少的 primary shard，比如 1 个，避免资源浪费。</p>
+</li>
+<li><p>对 document 的结构进行规范化&#x2F;标准化即使我们真的要将不同类型的 document 写入相同的索引中，还是有办法可以避免稀疏性，那就是对不同类型的 document 进行标准化。比如说，如果所有的 document 都有一个时间戳 field，不过有的叫做 timestamp，有的叫做 creation_date，那么可以将不同 document 的这个 field 重命名为相同的字段，尽量让 documment 的结构相同。另外一个，就是比如有的 document 有一个字段，叫做 goods_type，但是有的 document 没有这个字段，此时可以对没有这个字段的 document，补充一个 goods_type 给一个默认值，比如 default。</p>
+</li>
+<li><p>避免使用多个 types 存储不一样结构的 document 很多人会很喜欢在一个 index 中放很多个 types 来存储不同类型的数据。但是其实不是这样的，最好不要这么干，如果你在一个 index 中有多个 type，但是这些 type 的数据结构不太一样，那么这些 type 实际上底层都是写到这个索引中的，还是会导致稀疏性。如果多个 type 的结构不太一样，最好放入不同的索引中，不要写入一个索引中。</p>
+</li>
+<li><p>对稀疏的 field 禁用 norms 和 doc_values 如果上面的步骤都没法做，那么只能对那种稀疏的 field，禁止 norms 和 doc_values 字段，因为这两个字段的存储机制类似，都是每个 field 有一个全量的存储，对存储浪费很大。如果一个 field 不需要考虑其相关度分数，那么可以禁用 norms，如果不需要对一个 field 进行排序或者聚合，那么可以禁用 doc_values 字段。</p>
 </li>
 </ul>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test3 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test4 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test1，test2 划分到一个 vlan 中，vlan 在 mac 地址后加@指定，此处 mac 地址省略。</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">100</span></span><br></pre></td></tr></table></figure>
-
-<p>将 test3，test4 划分到另一个 vlan 中</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">200</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
-
-<p>完成上述操作后，使用 docker attach 连到容器中，然后用 ping 命令测试连通性，发现 test1 和 test2 可以相互通信，但与 test3 和 test4 隔离。这样，一个简单的 VLAN 隔离容器网络就已经完成。</p>
+<h2 id="es-集群优化"><a href="#es-集群优化" class="headerlink" title="es 集群优化"></a>es 集群优化</h2><blockquote>
+<p>平时使用 es 中，都会遇到性能较差的问题，这里说一下 es 日常使用中的一些优化和平时常使用的一些_cat 命令</p>
+</blockquote>
 <ul>
-<li>2.3、多主机 Docker 容器的 VLAN 划分</li>
+<li><p>1、增加 refresh 间隔<br>默认的 refresh 间隔是 1s，用 index.refresh_interval 参数可以设置，这样会其强迫 es 每秒中都将内存中的数据写入磁盘中，创建一个新的 segment file。正是这个间隔，让我们每次写入数据后，1s 以后才能看到。但是如果我们将这个间隔调大，比如 30s，可以接受写入的数据 30s 后才看到，那么我们就可以获取更大的写入吞吐量，因为 30s 内都是写内存的，每隔 30s 才会创建一个 segment file。</p>
+</li>
+<li><p>2、禁止使用 swap</p>
+<p>使用 bootstrap.mlockall: true 为 es 锁定内存</p>
+</li>
+<li><p>3、尽量大的系统内存 or 使用 SSD 硬盘</p>
+<p>除去被 es 锁定的内存，剩下的内存会被用来执行更多的 IO 操作，程序会将搜索的数据加载到内存中进行计算，其他的会在磁盘中进行计算。<br>例：<br>查询一天数据，总共 1T 数据，系统除去 32G 内存，还有 32G 内存，5 台机器总共 160G 内存，也就是说 1T 的数据只有 160G 数据在内存中计算，剩下的还是在磁盘中进行计算，磁盘会是一个极大的瓶颈。</p>
+</li>
+<li><p>4、区分 master、data、client 节点</p>
+<p>各司其职，不会被其他职责进程占用过多的资源</p>
+</li>
+<li><p>5、使用 ssd 磁盘时增大索引限制</p>
+</li>
 </ul>
-<p>为了实现这个目的，我们把宿主机上的网卡桥接到各自的 OVS 网桥上，然后再为容器配置 IP 和 VLAN 就可以了。<br>我们实验环境如下:</p>
-<blockquote>
-<p>主机 A 和 B 各有一块网卡 eth0，IP 地址分别为 192.168.137.100&#x2F;24，192.168.137.101&#x2F;24。<br>在主机 A 上创建两个容器 test1、test2，分别在 VLAN 100 和 VLAN 200 上。<br>在主机 B 上创建 test3、test4，分别在 VLAN 100 和 VLAN 200 上。<br>最终，test1 可以和 test3 通信，test2 可以和 test4 通信。</p>
-</blockquote>
-<h5 id="在主机-A-上"><a href="#在主机-A-上" class="headerlink" title="在主机 A 上"></a>在主机 A 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test1 centos /bin/bash</span></span><br><span class="line">docker <span class="built_in">run</span> -itd <span class="comment">--name test2 centos /bin/bash</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">&quot;indices.store.throttle.max_bytes_per_sec&quot;</span> <span class="punctuation">:</span> <span class="string">&quot;200mb&quot;</span></span><br></pre></td></tr></table></figure>
 
-<p>划分 VLAN</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">pipework</span> ovs0 test1 <span class="number">192.168.137.150</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test2 <span class="number">192.168.137.151</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>6、适当提高 bulk 队列</li>
+</ul>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;threadpool.bulk.queue_size&quot;</span> : 1024</span><br></pre></td></tr></table></figure>
 
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.100/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.100/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1dev ovs0</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>7、集群异常恢复慢</p>
+<ul>
+<li><p>关闭 relocations size 及磁盘使用率检查，重启完成后再打开</p>
+</li>
+<li><p>增大每个节点同时允许恢复的分片数</p>
+</li>
+<li><p>增大 rebalance 最小平衡阈值</p>
+</li>
+<li><p>调整 Index、shard、primary 平衡优先级</p>
+</li>
+<li><p>增大集群同时允许 rebalance 的分片数</p>
+</li>
+<li><p>增大 Recovery 时回放数据块大小</p>
+</li>
+</ul>
+</li>
+<li><p>8、冷热数据分离</p>
+<p>在资源允许的情况下，使用冷热数据分离，将最近 7 天的数据放在 ssd 磁盘或大内存机器中，将超过 7 天的数据放在普通磁盘的 data 节点中。</p>
+</li>
+</ul>
+<h2 id="常用集群监控命令"><a href="#常用集群监控命令" class="headerlink" title="常用集群监控命令"></a>常用集群监控命令</h2><ul>
+<li>1、看到集群中有哪些索引别名</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>aliases?v</span><br></pre></td></tr></table></figure>
 
-<h5 id="在主机-B-上"><a href="#在主机-B-上" class="headerlink" title="在主机 B 上"></a>在主机 B 上</h5><p>创建 Docker 容器</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">docker</span> run -itd --name test3 centos /bin/bash</span><br><span class="line"><span class="attribute">docker</span> run -itd --name test4 centos /bin/bash</span><br><span class="line"><span class="comment">#划分VLAN</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test3 <span class="number">192.168.137.152</span>/<span class="number">24</span> @<span class="number">100</span></span><br><span class="line"><span class="attribute">pipework</span> ovs0 test4 <span class="number">192.168.137.153</span>/<span class="number">24</span> @<span class="number">200</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li>2、看到每个节点分配了几个 shard，对磁盘的占用空间大小，使用率，等等</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>allocation?v</span><br></pre></td></tr></table></figure>
 
-<p>将 eth0 桥接到 ovs0 上</p>
-<figure class="highlight smali"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ip addr<span class="built_in"> add </span>192.168.137.101/24 dev ovs0;</span><br><span class="line">ip addr del 192.168.137.101/24 dev eth0;</span><br><span class="line">ovs-vsctl<span class="built_in"> add-port </span>ovs0 eth0;</span><br><span class="line">ip route del default;</span><br><span class="line">ip route<span class="built_in"> add </span>default gw 192.168.137.1 dev ovs0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>3、看每个索引的 document 数量</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span><span class="keyword">count</span>?v</span><br></pre></td></tr></table></figure>
 
-<p>完成上面的步骤后</p>
-<blockquote>
-<p>主机 A 上的 test1 和主机 B 上的 test3 容器就划分到了一个 VLAN 中，<br>并且与主机 A 上的 test2 和主机 B 上的 test4 隔离（主机 eth0 网卡需要设置为混杂模式，连接主机的交换机端口应设置为 trunk 模式，即允许 VLAN 100 和 VLAN 200 的包通过）。</p>
-</blockquote>
-<blockquote>
-<p>除此之外，pipework 还支持使用 macvlan 设备、设置网卡 MAC 地址等功能。不过，pipework 有一个缺陷，就是配置的容器在关掉重启后，之前的设置会丢失。</p>
-</blockquote>
+<ul>
+<li>4、看每个节点的 jvm heap 内存中的 fielddata 内存占用情况（对分词的 field 进行聚合&#x2F;排序要用 jvm heap 中的正排索引，fielddata）</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>fielddata?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>5、比较全面的看一个 es 集群的整体健康状况，主要是看是 green，yellow，red</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>health?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>6、每个索引的具体的情况，比如有几个 shard，多少个 document，被删除的 document 有多少，占用了多少磁盘空间</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/i</span>ndices?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>7、看 master node 当前的具体的情况，哪个 node 是当前的 master node</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/m</span>aster?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>8、看每个 node 的具体的情况，就比如 jvm heap 内存使用率，内存使用率，cpu load，是什么角色</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>nodes?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>9、看当前 pending 没执行完的 task 的具体情况，执行的是什么操作</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>pending_tasks?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>10、看当前集群安装了哪些插件</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> /_cat/plugins?v&amp;<span class="attribute">s</span>=component&amp;h=name,component,version,description</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>11、看 shard recovery 恢复的一个过程的具体情况</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> _cat/recovery?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>12、查看用于 snapshotting 的 repository 有哪些</li>
+</ul>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span><span class="keyword">repositories</span>?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>13、看每个线程池的具体的情况</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>thread_pool?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>14、看每个 shard 的具体的情况</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> _cat/shards?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>15、看每个 segement，索引 segment 文件的情况，在哪个 node 上，有多少个 document，占用了多少磁盘空间，有多少数据在内存中，是否可以搜索</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET <span class="regexp">/_cat/</span>segments?v</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>16、看当前执行的 snapshot 的操作</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> /_cat/snapshots?v&amp;<span class="attribute">s</span>=id</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>17、看当前有的那些 tempalte，具体的情况是什么</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> /_cat/templates?v&amp;<span class="attribute">s</span>=name</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>18、查看集群总的状态</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> _cluster/health</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>19、查看集群的所有情况，很全面</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> _cluster/stats?human&amp;pretty</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>20、查看集群总的 pending_tasks 情况</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> _cluster/pending_tasks</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>21、查看集群那个索引影响了集群的状态</li>
+</ul>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">GET</span> _cluster/health?<span class="attribute">level</span>=indices</span><br></pre></td></tr></table></figure>
 
     
 
@@ -304,7 +406,7 @@
         </li>
         <li>
           <strong>本文链接：</strong>
-          <a href="https://syklinux.github.io/2023/09/28/docker-pipework/" title="docker容器—PIPEWORK解读与实践" target="_blank">https://syklinux.github.io/2023/09/28/docker-pipework/</a>
+          <a href="https://syklinux.github.io/2023/09/28/elasticsearch-optimize/" title="elasticsearch基础优化" target="_blank">https://syklinux.github.io/2023/09/28/elasticsearch-optimize/</a>
         </li>
         
         <li>
@@ -330,7 +432,7 @@
         		</li>
       		 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">docker</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">elasticsearch</a>
         		</li>
       		
 		</ul>
@@ -386,7 +488,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/docker-pipework/" alt="微信分享二维码"> -->
+     <!-- <img src="//pan.baidu.com/share/qrcode?url=https://syklinux.github.io/2023/09/28/elasticsearch-optimize/" alt="微信分享二维码"> -->
     </div>
 </div>
 
@@ -401,18 +503,9 @@
 
 <nav id="article-nav">
   
-    <a href="/2023/09/28/elasticsearch-introduce/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          elasticsearch相关介绍
-        
-      </div>
-    </a>
   
-  
-    <a href="/2023/09/28/docker-net/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">docker容器—网络模式</div>
+    <a href="/2023/09/28/elasticsearch-slowlog/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">elasticsearch开启慢查询日志</div>
       <i class="icon-circle-right"></i>
     </a>
   
